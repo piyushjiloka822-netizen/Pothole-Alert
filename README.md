@@ -1,5 +1,7 @@
 # Pothole Grievance Portal — Municipal Corporation of Lucknow (prototype)
 
+A full-stack civic-tech platform for reporting, tracking, assigning, and resolving potholes. Citizens can submit GPS/photo complaints with severity details, while municipal officers manage workers, resources, repair photos, and verification.
+
 A static, no-build citizen pothole-reporting portal + an admin/officer dashboard.
 Live demo: https://pothole-application.vercel.app/
 
@@ -180,4 +182,4 @@ To test the `/api/verify-pothole` serverless function locally, use the
   navigation feature
 - No citizen gamification/badge scoring
 - OTP/Aadhaar login on `login.html` is a UI mock, not wired to a real
-  identity provider
+   identity provider
