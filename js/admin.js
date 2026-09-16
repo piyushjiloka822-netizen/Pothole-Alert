@@ -4,7 +4,7 @@
  * SSE real-time updates, and status management.
  */
 
-const API_BASE = window.location.origin + '/api';
+const ADMIN_API_BASE = window.location.origin + '/api';
 
 /* ── Toast ────────────────────────────────────────────────────── */
 const AdminToast = {
@@ -87,7 +87,7 @@ const AdminApp = {
       const id = this._pendingResolveId;
       if (!id) return;
       try {
-        await fetch(`${API_BASE}/reports/${id}/resolve`, {
+        await fetch(`${ADMIN_API_BASE}/reports/${id}/resolve`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ afterPhoto: this._pendingAfterPhoto || null })
@@ -116,7 +116,7 @@ const AdminApp = {
   /* ── SSE — Real-time Connection ───────────────────────────── */
   initSSE() {
     try {
-      this.sseSource = new EventSource(`${API_BASE}/events`);
+      this.sseSource = new EventSource(`${ADMIN_API_BASE}/events`);
       const statusEl = document.getElementById('sse-status');
 
       this.sseSource.addEventListener('connected', () => {
@@ -264,7 +264,7 @@ const AdminApp = {
       if (!id) return;
 
       try {
-        await fetch(`${API_BASE}/reports/${id}/resolve`, {
+        await fetch(`${ADMIN_API_BASE}/reports/${id}/resolve`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ afterPhoto: this._pendingAfterPhoto || null })
@@ -304,7 +304,7 @@ const AdminApp = {
   /* ── Workers Fetch ────────────────────────────────────────── */
   async fetchWorkers() {
     try {
-      const resp = await fetch(`${API_BASE}/workers`);
+      const resp = await fetch(`${ADMIN_API_BASE}/workers`);
       if (resp.ok) this.workers = await resp.json();
     } catch { this.workers = []; }
   },
@@ -536,7 +536,7 @@ const AdminApp = {
       if (!name) { AdminToast.show('Worker name is required', 'error'); return; }
 
       try {
-        await fetch(`${API_BASE}/workers`, {
+        await fetch(`${ADMIN_API_BASE}/workers`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, phone, specialization })
@@ -583,7 +583,7 @@ const AdminApp = {
       const reader = new FileReader();
       reader.onload = async () => {
         try {
-          const response = await fetch(`${API_BASE}/reports/${reportId}/worker-photo`, {
+          const response = await fetch(`${ADMIN_API_BASE}/reports/${reportId}/worker-photo`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ photo: reader.result })
@@ -652,7 +652,7 @@ const AdminApp = {
   async deleteWorker(id) {
     if (!confirm('Are you sure you want to remove this worker?')) return;
     try {
-      await fetch(`${API_BASE}/workers/${id}`, { method: 'DELETE' });
+      await fetch(`${ADMIN_API_BASE}/workers/${id}`, { method: 'DELETE' });
       await this.fetchWorkers();
       this.renderWorkers();
       this.updateNavBadges();
@@ -680,7 +680,7 @@ const AdminApp = {
     document.getElementById('compare-approve')?.addEventListener('click', async () => {
       const id = this._compareTicketId;
       if (!id) return;
-      await fetch(`${API_BASE}/reports/${id}/resolve`, {
+      await fetch(`${ADMIN_API_BASE}/reports/${id}/resolve`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ afterPhoto: Storage.getReport(id)?.workerPhoto || null })

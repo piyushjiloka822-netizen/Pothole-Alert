@@ -753,7 +753,7 @@ const App = {
     submitBtn.classList.add('loading');
     submitBtn.disabled = true;
 
-    setTimeout(() => {
+    setTimeout(async () => {
       const ticketId = Storage.generateTicketId();
       const report = {
         id: ticketId, ticketId,
