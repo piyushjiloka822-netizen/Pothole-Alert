@@ -1,0 +1,2508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pothole Grievance Portal — Municipal Corporation of Lucknow</title>
+  <meta name="description" content="Official Pothole Grievance Reporting System of Municipal Corporation of Lucknow (MCL). Report road damage, track repair status, and engage with your local government for faster road repairs." />
+  <meta name="keywords" content="pothole, MCL, Municipal Corporation Lucknow, road repair, grievance, e-governance, UP" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Admin CSS -->
+  <link rel="stylesheet" href="css/admin.css" />
+  <!-- Unified Dashboard CSS -->
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ── Skip Navigation (Accessibility / GIGW) ─────────────────── -->
+<a href="#main-content" class="sr-skip-link" style="position:absolute;left:-9999px;top:0;z-index:9999;padding:8px 16px;background:var(--gov-blue-deep);color:#fff;font-size:13px;font-weight:600;border-radius:0 0 4px 0;" onfocus="this.style.left='0'">Skip to Main Content</a>
+
+<!-- ── Offline Banner ─────────────────────────────────────────── -->
+<div id="offline-banner" class="offline-banner">⚠️ You are offline. Reports will be queued and submitted when connection is restored.</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     UNIFIED DASHBOARD SHELL
+══════════════════════════════════════════════════════════════ -->
+<div class="dashboard-shell">
+
+<!-- ── Mobile Sidebar Overlay ────────────────────────────────── -->
+<div class="mobile-sidebar-overlay" id="mobile-sidebar-overlay" onclick="Dashboard.closeMobileSidebar()"></div>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════════ -->
+<aside class="dashboard-sidebar" role="navigation" aria-label="Dashboard navigation">
+
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon" aria-hidden="true">🏛️</div>
+    <div class="sidebar-brand-text">
+      <div class="sidebar-brand-name">MCL Grievance</div>
+      <span class="sidebar-brand-badge">UNIFIED PORTAL</span>
+    </div>
+    <button class="sidebar-toggle-btn" id="sidebar-collapse-btn" title="Toggle sidebar" aria-label="Toggle sidebar">☰</button>
+  </div>
+
+  <!-- Nav Area -->
+  <div class="sidebar-nav-area">
+
+    <!-- ── Citizen Section ──────────────────────────────────── -->
+    <div class="sidebar-section-title">Citizen Portal</div>
+
+    <button class="sidebar-nav-item active" data-view="citizen-home" data-role="citizen">
+      <span class="sidebar-nav-icon">🏠</span>
+      <span class="sidebar-nav-label">Home / Map</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="citizen-services" data-role="citizen">
+      <span class="sidebar-nav-icon">📋</span>
+      <span class="sidebar-nav-label">Services</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="citizen-track" data-role="citizen">
+      <span class="sidebar-nav-icon">🔍</span>
+      <span class="sidebar-nav-label">Track Report</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="citizen-about" data-role="citizen">
+      <span class="sidebar-nav-icon">ℹ️</span>
+      <span class="sidebar-nav-label">About</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="citizen-contact" data-role="citizen">
+      <span class="sidebar-nav-icon">📞</span>
+      <span class="sidebar-nav-label">Contact</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="citizen-rti" data-role="citizen">
+      <span class="sidebar-nav-icon">📄</span>
+      <span class="sidebar-nav-label">RTI</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="citizen-downloads" data-role="citizen">
+      <span class="sidebar-nav-icon">⬇️</span>
+      <span class="sidebar-nav-label">Downloads</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="citizen-login" data-role="citizen">
+      <span class="sidebar-nav-icon">👤</span>
+      <span class="sidebar-nav-label">Citizen Login</span>
+    </button>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- ── Admin Gate ───────────────────────────────────────── -->
+    <div class="sidebar-admin-gate">
+      <button class="sidebar-admin-lock-btn" id="admin-gate-btn">
+        <span class="lock-icon">🔐</span>
+        <span>Officer Portal</span>
+      </button>
+      <form class="sidebar-admin-login-form" id="sidebar-admin-login-form">
+        <div class="sidebar-admin-error" id="sidebar-admin-error"></div>
+        <input type="password" id="sidebar-admin-password" placeholder="Enter officer password…" autocomplete="current-password" />
+        <button type="submit" class="sidebar-admin-login-btn">🔑 Sign In</button>
+        <div class="sidebar-admin-hint">Demo password: <strong>admin123</strong></div>
+      </form>
+    </div>
+
+    <!-- ── Admin Section (hidden until authenticated) ──────── -->
+    <div class="sidebar-section-title" id="admin-section-title" style="display:none">Management</div>
+
+    <button class="sidebar-nav-item" data-view="admin-kanban" data-role="admin" style="display:none">
+      <span class="sidebar-nav-icon">📋</span>
+      <span class="sidebar-nav-label">Complaint Board</span>
+      <span class="sidebar-badge" id="badge-pending">0</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="admin-workers" data-role="admin" style="display:none">
+      <span class="sidebar-nav-icon">👷</span>
+      <span class="sidebar-nav-label">Workers & Assign</span>
+      <span class="sidebar-badge blue" id="badge-workers">0</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="admin-verification" data-role="admin" style="display:none">
+      <span class="sidebar-nav-icon">📸</span>
+      <span class="sidebar-nav-label">Photo Verification</span>
+      <span class="sidebar-badge amber" id="badge-verification">0</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="admin-analytics" data-role="admin" style="display:none">
+      <span class="sidebar-nav-icon">📊</span>
+      <span class="sidebar-nav-label">Analytics</span>
+    </button>
+
+    <div class="sidebar-section-title" id="admin-alerts-title" style="display:none">Alerts</div>
+
+    <button class="sidebar-nav-item" data-view="admin-escalated" data-role="admin" style="display:none">
+      <span class="sidebar-nav-icon">⚠️</span>
+      <span class="sidebar-nav-label">Escalated</span>
+      <span class="sidebar-badge amber" id="badge-escalated">0</span>
+    </button>
+
+    <div class="sidebar-section-title" id="admin-system-title" style="display:none">System</div>
+
+    <button class="sidebar-nav-item" data-view="admin-errors" data-role="admin" style="display:none">
+      <span class="sidebar-nav-icon">🐛</span>
+      <span class="sidebar-nav-label">Error Logs</span>
+      <span class="sidebar-badge" id="badge-errors" style="background:rgba(239,68,68,0.2);color:#EF4444;display:none">0</span>
+    </button>
+
+    <button class="sidebar-nav-item" data-view="admin-audit" data-role="admin" style="display:none">
+      <span class="sidebar-nav-icon">📜</span>
+      <span class="sidebar-nav-label">Audit Trail</span>
+    </button>
+
+    <div class="sidebar-divider"></div>
+    <button class="sidebar-logout-btn" id="admin-logout-btn" style="display:none;margin:8px 16px">
+      <span class="sidebar-logout-text">🚪 Officer Logout</span>
+    </button>
+
+  </div><!-- /sidebar-nav-area -->
+
+  <!-- User Footer -->
+  <div class="sidebar-user-area">
+    <div class="sidebar-user-row">
+      <div class="sidebar-user-avatar">C</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Citizen</div>
+        <div class="sidebar-user-role">Public Portal</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN CONTENT AREA ═════════════════════════════════════ -->
+<div class="dashboard-main">
+
+<!-- ═══ CITIZEN HOME VIEW ═════════════════════════════════════ -->
+<div class="dashboard-view citizen-map-view active" id="view-citizen-home">
+
+<!-- ══════════════════════════════════════════════════════════════
+     GOVERNMENT CHROME
+══════════════════════════════════════════════════════════════ -->
+
+<!-- 1. Tricolor Strip -->
+<div class="tricolor-strip" aria-hidden="true"></div>
+
+<!-- 2. Utility Bar -->
+<div class="utility-bar" role="navigation" aria-label="Utility navigation">
+  <a href="#main-content" class="util-skip">Skip to Content</a>
+  <span class="util-sep">|</span>
+  <a href="#" onclick="document.getElementById('screen-reader-info').classList.toggle('hidden');return false;">Screen Reader</a>
+  <span class="util-sep">|</span>
+  <span>Text Size:</span>
+  <div class="font-size-controls" aria-label="Font size controls">
+    <button onclick="setFontSize('small')" title="Decrease font size" aria-label="Small font">A-</button>
+    <button onclick="setFontSize('normal')" title="Normal font size" aria-label="Normal font">A</button>
+    <button onclick="setFontSize('large')" title="Increase font size" aria-label="Large font">A+</button>
+  </div>
+  <span class="util-sep">|</span>
+  <button onclick="toggleHighContrast()" title="Toggle high contrast" aria-label="High contrast mode">High Contrast</button>
+  <div class="util-right">
+    <!-- Hidden select for backward compat -->
+    <select class="lang-select" onchange="setLang(this.value)" aria-label="Select language" style="display:none">
+      <option value="en">English</option>
+      <option value="hi">हिन्दी</option>
+      <option value="ur">اردو</option>
+      <option value="ta">தமிழ்</option>
+      <option value="te">తెలుగు</option>
+      <option value="bn">বাংলা</option>
+      <option value="mr">मराठी</option>
+      <option value="gu">ગુજરાતી</option>
+      <option value="kn">ಕನ್ನಡ</option>
+      <option value="ml">മലയാളം</option>
+      <option value="pa">ਪੰਜਾਬੀ</option>
+      <option value="or">ଓଡ଼ିଆ</option>
+    </select>
+    <!-- Premium Language Selector -->
+    <div class="lang-switcher" id="lang-switcher">
+      <button class="lang-switcher-btn" id="lang-switcher-btn" onclick="toggleLangDropdown()" aria-label="Select language" aria-haspopup="listbox">
+        <span class="lang-globe">🌐</span>
+        <span class="lang-current-name" id="lang-current-name">English</span>
+        <span class="lang-chevron">▾</span>
+      </button>
+      <div class="lang-dropdown" id="lang-dropdown" role="listbox" aria-label="Available languages">
+        <div class="lang-dropdown-item active" data-lang="en" onclick="selectLang('en')" role="option"><span class="lang-script">A</span><span class="lang-native">English</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="hi" onclick="selectLang('hi')" role="option"><span class="lang-script">अ</span><span class="lang-native">हिन्दी</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="ur" onclick="selectLang('ur')" role="option"><span class="lang-script">ا</span><span class="lang-native">اردو</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="ta" onclick="selectLang('ta')" role="option"><span class="lang-script">அ</span><span class="lang-native">தமிழ்</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="te" onclick="selectLang('te')" role="option"><span class="lang-script">అ</span><span class="lang-native">తెలుగు</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="bn" onclick="selectLang('bn')" role="option"><span class="lang-script">অ</span><span class="lang-native">বাংলা</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="mr" onclick="selectLang('mr')" role="option"><span class="lang-script">म</span><span class="lang-native">मराठी</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="gu" onclick="selectLang('gu')" role="option"><span class="lang-script">અ</span><span class="lang-native">ગુજરાતી</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="kn" onclick="selectLang('kn')" role="option"><span class="lang-script">ಅ</span><span class="lang-native">ಕನ್ನಡ</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="ml" onclick="selectLang('ml')" role="option"><span class="lang-script">അ</span><span class="lang-native">മലയാളം</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="pa" onclick="selectLang('pa')" role="option"><span class="lang-script">ਅ</span><span class="lang-native">ਪੰਜਾਬੀ</span><span class="lang-check">✓</span></div>
+        <div class="lang-dropdown-item" data-lang="or" onclick="selectLang('or')" role="option"><span class="lang-script">ଅ</span><span class="lang-native">ଓଡ଼ିଆ</span><span class="lang-check">✓</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Government Header -->
+<header class="gov-header" role="banner">
+
+
+  <!-- CENTRE: National Emblem (Ashoka Lion Capital) — Real Image -->
+  <div class="gov-emblem-centre" aria-label="National Emblem of India — Ashoka Lion Capital">
+    <img src="images/ashoka_emblem.png" alt="National Emblem of India — Ashoka Lion Capital" class="gov-emblem-img" style="width:50px;height:55px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.4));" />
+    <div class="gov-emblem-label" lang="hi">सत्यमेव जयते</div>
+  </div>
+
+  <div class="gov-header-divider" aria-hidden="true"></div>
+
+  <div class="gov-header-text">
+    <div class="gov-header-dept-hi" lang="hi" data-i18n="header.deptHi">नगर निगम लखनऊ — सड़क शिकायत पोर्टल</div>
+    <div class="gov-header-dept-en" data-i18n="header.deptEn">Municipal Corporation of Lucknow</div>
+    <div class="gov-header-ministry" data-i18n="header.ministry">Road Grievance &amp; Pothole Repair Tracking System | Government of Uttar Pradesh</div>
+  </div>
+
+  <div class="gov-header-right">
+    <!-- Live Stats -->
+    <div class="gov-header-stats" aria-label="Report statistics">
+      <div class="stat-pill pending">
+        <div class="dot"></div>
+        <span id="stat-pending">0</span> Pending
+      </div>
+      <div class="stat-pill progress">
+        <div class="dot"></div>
+        <span id="stat-progress">0</span> Active
+      </div>
+      <div class="stat-pill resolved">
+        <div class="dot"></div>
+        <span id="stat-resolved">0</span> Resolved
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <button class="btn-notif" id="notif-btn" title="Notifications" aria-label="View notifications">
+      🔔
+      <span class="notif-badge" id="notif-badge" style="display:none">0</span>
+    </button>
+
+    <!-- Citizen Login -->
+    <button class="btn-citizen-login" id="header-login-btn" aria-label="Citizen Login">
+      👤 Citizen Login
+    </button>
+  </div>
+</header>
+
+<!-- 4. Navigation Bar -->
+<nav class="gov-nav" role="navigation" aria-label="Main navigation">
+  <ul class="gov-nav-list">
+    <li><a href="#" class="active" id="nav-home" onclick="closeAllPages();return false;" data-i18n="nav.home">🏠 Home</a></li>
+    <li><a href="#" id="nav-about" onclick="openAbout();return false;" data-i18n="nav.about">ℹ️ About</a></li>
+    <li><a href="#" id="nav-services" onclick="openServices();return false;" data-i18n="nav.services">📋 Services</a></li>
+    <li>
+      <button class="nav-report-btn" id="nav-report-btn" aria-label="Report a Pothole" data-i18n="nav.report">
+        📍 Report a Pothole
+      </button>
+    </li>
+    <li>
+      <button class="nav-report-btn nav-quick-btn" id="nav-quick-report-btn" aria-label="Quick Report — photo only" title="Just snap a photo — we auto-detect your live location, no form needed">
+        ⚡ Quick Report
+      </button>
+    </li>
+    <li><a href="#" id="nav-track" onclick="openTrack();return false;" data-i18n="nav.track">🔍 Track Report</a></li>
+    <li><a href="#" id="nav-rti" onclick="openRTI();return false;" data-i18n="nav.rti">📄 RTI</a></li>
+    <li><a href="#" id="nav-downloads" onclick="openDownloads();return false;" data-i18n="nav.downloads">⬇️ Downloads</a></li>
+    <li><a href="#" id="nav-contact" onclick="openContact();return false;" data-i18n="nav.contact">📞 Contact</a></li>
+  </ul>
+</nav>
+
+<!-- 5. Notice Ticker -->
+<div class="notice-ticker" role="marquee" aria-label="Notices and Announcements">
+  <div class="ticker-label">📢 NOTICES</div>
+  <div class="ticker-track">
+    <div class="ticker-content" id="ticker-content">
+      <span>Pothole repair work in progress on Ring Road & Shaheed Path, Lucknow — residents requested to cooperate</span>
+      <span class="ticker-sep">◆</span>
+      <span>MCL has resolved 1,847 potholes in Q1 2025 — Thank you for your reports | नगर निगम लखनऊ</span>
+      <span class="ticker-sep">◆</span>
+      <span>Monsoon Road Damage Reporting Drive active — Submit your report for priority action within 7 working days</span>
+      <span class="ticker-sep">◆</span>
+      <span>New escalation policy: Any report older than 30 days is automatically forwarded to Senior Officers, Roads Dept.</span>
+      <span class="ticker-sep">◆</span>
+      <span>Hazratganj-Aminabad stretch repair scheduled for Aug 2025 — Report additional damage via this portal</span>
+    </div>
+  </div>
+</div>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar" aria-label="Breadcrumb">
+  <a href="#">Home</a>
+  <span class="bc-sep">›</span>
+  <span class="bc-current">Pothole Grievance Map</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CM GOVERNMENT PHOTO BANNER
+══════════════════════════════════════════════════════════════ -->
+<div class="cm-banner" role="complementary" aria-label="Chief Minister Message">
+  <!-- Background image -->
+  <div class="cm-banner-bg" style="background-image:url('images/cm_yogi.png')" aria-hidden="true"></div>
+  <!-- Overlay content -->
+  <div class="cm-banner-overlay">
+    <div class="cm-banner-flag">
+      <img src="images/ashoka_emblem.png" alt="National Emblem of India" style="height:38px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5));" />
+    </div>
+    <div class="cm-banner-content">
+      <div class="cm-banner-quote" lang="hi">"विकसित उत्तर प्रदेश — सुगम, सुरक्षित और स्वच्छ सड़कें"</div>
+      <div class="cm-banner-quote-en">"A Developed Uttar Pradesh — Smooth, Safe and Clean Roads for All Citizens"</div>
+      <div class="cm-banner-attr">— Yogi Adityanath, Hon'ble Chief Minister, Uttar Pradesh</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MAP (main content)
+══════════════════════════════════════════════════════════════ -->
+<main id="main-content" role="main">
+
+  <!-- Map -->
+  <div id="map" role="application" aria-label="Interactive pothole map of Lucknow — report locations"></div>
+
+  <!-- Map Search Bar -->
+  <div class="map-search-bar" role="search" aria-label="Search pothole reports">
+    <span aria-hidden="true">🔍</span>
+    <input class="map-search-input" id="map-search-input" type="text"
+      placeholder="Search by Ticket ID, area, or address…" aria-label="Search reports" />
+    <button class="map-search-btn" id="map-search-btn">Search</button>
+  </div>
+
+  <!-- Map Legend -->
+  <div class="map-legend" role="complementary" aria-label="Map pin legend">
+    <div class="legend-title">Pin Status</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div> Pending</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div> Scheduled</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2980b9"></div> In Progress</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div> Resolved</div>
+  </div>
+
+</main>
+
+</div><!-- /view-citizen-home -->
+
+<!-- ═══ CITIZEN SERVICES VIEW ═══════════════════════════════════ -->
+<div class="dashboard-view" id="view-citizen-services">
+<div class="services-section active" id="services-section" style="position:relative;display:block;">
+  <div class="services-inner">
+
+    <!-- Back to Map -->
+    <button class="btn-back-map" id="btn-back-map" onclick="closeServices()">← <span data-i18n="bc.home">Home</span> / <span data-i18n="map.legend">Map</span></button>
+
+    <!-- ── Services Header ──────────────────────────────────────── -->
+    <div class="section-header">
+      <div class="section-header-icon" aria-hidden="true">📋</div>
+      <h2 data-i18n="services.title">Our Services</h2>
+      <p data-i18n="services.subtitle">Comprehensive municipal road infrastructure services for the citizens of Lucknow</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- ── Services Grid ────────────────────────────────────────── -->
+    <div class="services-grid" id="services-grid">
+
+      <!-- 1. Pothole Reporting -->
+      <div class="service-card card-pothole" onclick="handleServiceClick('pothole')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">🕳️</div>
+        <div class="service-card-title" data-i18n="services.pothole">Pothole Reporting</div>
+        <div class="service-card-desc" data-i18n="services.potholeDesc">Report road potholes with GPS location, photo evidence, and severity assessment for priority repair.</div>
+        <button class="service-card-action" data-i18n="services.reportNow">Report Now</button>
+      </div>
+
+      <!-- 2. Road Resurfacing -->
+      <div class="service-card card-resurfacing" onclick="handleServiceClick('resurfacing')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">🛣️</div>
+        <div class="service-card-title" data-i18n="services.resurfacing">Road Resurfacing Request</div>
+        <div class="service-card-desc" data-i18n="services.resurfacingDesc">Request complete road resurfacing for severely damaged stretches in your area.</div>
+        <button class="service-card-action" data-i18n="services.requestNow">Request Now</button>
+      </div>
+
+      <!-- 3. Waterlogging -->
+      <div class="service-card card-waterlogging" onclick="handleServiceClick('waterlogging')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">💧</div>
+        <div class="service-card-title" data-i18n="services.waterlogging">Waterlogging Complaint</div>
+        <div class="service-card-desc" data-i18n="services.waterloggingDesc">Report waterlogging and drainage blockages on roads causing traffic disruption.</div>
+        <button class="service-card-action" data-i18n="services.reportNow">Report Now</button>
+      </div>
+
+      <!-- 4. Traffic Signal -->
+      <div class="service-card card-traffic" onclick="handleServiceClick('traffic')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">🚦</div>
+        <div class="service-card-title" data-i18n="services.traffic">Traffic Signal Issue</div>
+        <div class="service-card-desc" data-i18n="services.trafficDesc">Report malfunctioning, damaged, or missing traffic signals at intersections.</div>
+        <button class="service-card-action" data-i18n="services.reportNow">Report Now</button>
+      </div>
+
+      <!-- 5. Tree Hazard -->
+      <div class="service-card card-tree" onclick="handleServiceClick('tree')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">🌳</div>
+        <div class="service-card-title" data-i18n="services.tree">Tree Hazard / Fallen Tree</div>
+        <div class="service-card-desc" data-i18n="services.treeDesc">Report dangerous or fallen trees on or near roads posing risk to commuters.</div>
+        <button class="service-card-action" data-i18n="services.reportNow">Report Now</button>
+      </div>
+
+      <!-- 6. Streetlight -->
+      <div class="service-card card-streetlight" onclick="handleServiceClick('streetlight')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">💡</div>
+        <div class="service-card-title" data-i18n="services.streetlight">Streetlight Complaint</div>
+        <div class="service-card-desc" data-i18n="services.streetlightDesc">Report non-functional, flickering, or broken streetlights in your locality.</div>
+        <button class="service-card-action" data-i18n="services.reportNow">Report Now</button>
+      </div>
+
+      <!-- 7. Encroachment -->
+      <div class="service-card card-encroachment" onclick="handleServiceClick('encroachment')">
+        <span class="service-card-badge coming-soon" data-i18n="services.comingSoon">Coming Soon</span>
+        <div class="service-card-icon">🚧</div>
+        <div class="service-card-title" data-i18n="services.encroachment">Encroachment Reporting</div>
+        <div class="service-card-desc" data-i18n="services.encroachmentDesc">Report illegal encroachments, unauthorized constructions on public roads.</div>
+        <button class="service-card-action" data-i18n="services.viewDetails">View Details</button>
+      </div>
+
+      <!-- 8. Garbage / Solid Waste -->
+      <div class="service-card card-garbage" onclick="handleServiceClick('garbage')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">🗑️</div>
+        <div class="service-card-title" data-i18n="services.garbage">Solid Waste / Garbage</div>
+        <div class="service-card-desc" data-i18n="services.garbageDesc">Report garbage dumping, waste accumulation, or missing dustbins on roads.</div>
+        <button class="service-card-action" data-i18n="services.reportNow">Report Now</button>
+      </div>
+
+      <!-- 9. Road Safety Audit -->
+      <div class="service-card card-safety" onclick="handleServiceClick('safety')">
+        <span class="service-card-badge coming-soon" data-i18n="services.comingSoon">Coming Soon</span>
+        <div class="service-card-icon">📊</div>
+        <div class="service-card-title" data-i18n="services.safety">Road Safety Audit</div>
+        <div class="service-card-desc" data-i18n="services.safetyDesc">Request a professional safety audit for accident-prone or dangerous road stretches.</div>
+        <button class="service-card-action" data-i18n="services.requestNow">Request Now</button>
+      </div>
+
+      <!-- 10. Track Complaint -->
+      <div class="service-card card-track" onclick="handleServiceClick('track')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">🔍</div>
+        <div class="service-card-title" data-i18n="services.track">Track Complaint Status</div>
+        <div class="service-card-desc" data-i18n="services.trackDesc">Track the real-time status of your submitted complaints using your Ticket ID.</div>
+        <button class="service-card-action" data-i18n="services.trackNow">Track Now</button>
+      </div>
+
+      <!-- 11. Download Forms -->
+      <div class="service-card card-download" onclick="handleServiceClick('download')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">📥</div>
+        <div class="service-card-title" data-i18n="services.download">Download Forms</div>
+        <div class="service-card-desc" data-i18n="services.downloadDesc">Download RTI application forms, NOC formats, road permits, and certificates.</div>
+        <button class="service-card-action" data-i18n="services.downloadNow">Download</button>
+      </div>
+
+      <!-- 12. Helpline -->
+      <div class="service-card card-helpline" onclick="handleServiceClick('helpline')">
+        <span class="service-card-badge active" data-i18n="services.active">Active</span>
+        <div class="service-card-icon">📞</div>
+        <div class="service-card-title" data-i18n="services.helpline">Helpline & Emergency</div>
+        <div class="service-card-desc" data-i18n="services.helplineDesc">Access emergency contacts, toll-free helpline numbers, and 24/7 support.</div>
+        <button class="service-card-action" data-i18n="services.callNow">Call Now</button>
+      </div>
+
+    </div><!-- /services-grid -->
+
+    <!-- ── Quick Stats Dashboard ────────────────────────────────── -->
+    <div class="quick-stats-section">
+      <div class="quick-stats-header">
+        <h3 data-i18n="stats.title">Portal Performance Dashboard</h3>
+        <p data-i18n="stats.subtitle">Real-time statistics of MCL Road Grievance Resolution</p>
+      </div>
+      <div class="quick-stats-grid">
+        <div class="quick-stat-card">
+          <div class="quick-stat-icon">📋</div>
+          <div class="quick-stat-value" id="qs-total">2,847</div>
+          <div class="quick-stat-label" data-i18n="stats.totalComplaints">Total Complaints</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="quick-stat-icon">✅</div>
+          <div class="quick-stat-value" id="qs-resolved">2,134</div>
+          <div class="quick-stat-label" data-i18n="stats.resolvedComplaints">Resolved</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="quick-stat-icon">⏱️</div>
+          <div class="quick-stat-value" id="qs-avg">4.2 <span class="stat-value-suffix" data-i18n="stats.days">days</span></div>
+          <div class="quick-stat-label" data-i18n="stats.avgResolution">Avg. Resolution Time</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="quick-stat-icon">⭐</div>
+          <div class="quick-stat-value">87<span class="stat-value-suffix">%</span></div>
+          <div class="quick-stat-label" data-i18n="stats.citizenSatisfaction">Citizen Satisfaction</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="quick-stat-icon">🔧</div>
+          <div class="quick-stat-value">24</div>
+          <div class="quick-stat-label" data-i18n="stats.activeCrews">Active Repair Crews</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="quick-stat-icon">🗺️</div>
+          <div class="quick-stat-value">9</div>
+          <div class="quick-stat-label" data-i18n="stats.zonesActive">Zones Active</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Department Officials ──────────────────────────────────── -->
+    <div class="dept-section">
+      <div class="section-header">
+        <div class="section-header-icon" aria-hidden="true">🏛️</div>
+        <h2 data-i18n="dept.title">Department Officials</h2>
+        <p data-i18n="dept.subtitle">Municipal Corporation of Lucknow — Roads & Infrastructure Department</p>
+        <div class="section-divider"></div>
+      </div>
+
+      <div class="dept-grid">
+        <!-- Mayor -->
+        <div class="dept-card">
+          <img src="images/mayor.png" alt="Hon'ble Mayor" class="dept-card-photo" loading="lazy" />
+          <div class="dept-card-info">
+            <div class="dept-card-role" data-i18n="dept.mayor">Hon'ble Mayor</div>
+            <div class="dept-card-name" data-i18n="dept.mayorName">Smt. Sanyukta Bhatia</div>
+            <div class="dept-card-desig" data-i18n="dept.mayorDesig">Mayor, Municipal Corporation of Lucknow</div>
+          </div>
+        </div>
+
+        <!-- Municipal Commissioner -->
+        <div class="dept-card">
+          <img src="images/commissioner.png" alt="Municipal Commissioner" class="dept-card-photo" loading="lazy" />
+          <div class="dept-card-info">
+            <div class="dept-card-role" data-i18n="dept.commissioner">Municipal Commissioner</div>
+            <div class="dept-card-name" data-i18n="dept.commissionerName">Shri Indrajit Singh, IAS</div>
+            <div class="dept-card-desig" data-i18n="dept.commissionerDesig">Municipal Commissioner, MCL</div>
+          </div>
+        </div>
+
+        <!-- Additional Commissioner -->
+        <div class="dept-card">
+          <img src="images/addl_commissioner.png" alt="Additional Municipal Commissioner" class="dept-card-photo" loading="lazy" />
+          <div class="dept-card-info">
+            <div class="dept-card-role" data-i18n="dept.addlCommissioner">Addl. Municipal Commissioner</div>
+            <div class="dept-card-name" data-i18n="dept.addlCommissionerName">Shri Arvind Kumar, IAS</div>
+            <div class="dept-card-desig" data-i18n="dept.addlCommissionerDesig">Additional Commissioner (Infrastructure)</div>
+          </div>
+        </div>
+
+        <!-- Chief Engineer -->
+        <div class="dept-card">
+          <img src="images/chief_engineer.png" alt="Chief Engineer" class="dept-card-photo" loading="lazy" />
+          <div class="dept-card-info">
+            <div class="dept-card-role" data-i18n="dept.chiefEngineer">Chief Engineer (Roads)</div>
+            <div class="dept-card-name" data-i18n="dept.chiefEngineerName">Shri R.K. Srivastava</div>
+            <div class="dept-card-desig" data-i18n="dept.chiefEngineerDesig">Chief Engineer, Roads & Infrastructure</div>
+          </div>
+        </div>
+
+        <!-- Executive Engineer -->
+        <div class="dept-card">
+          <img src="images/executive_engineer.png" alt="Executive Engineer" class="dept-card-photo" loading="lazy" />
+          <div class="dept-card-info">
+            <div class="dept-card-role" data-i18n="dept.execEngineer">Executive Engineer</div>
+            <div class="dept-card-name" data-i18n="dept.execEngineerName">Shri Anil Kumar Verma</div>
+            <div class="dept-card-desig" data-i18n="dept.execEngineerDesig">Executive Engineer, Roads Division</div>
+          </div>
+        </div>
+
+        <!-- Zonal Officer -->
+        <div class="dept-card">
+          <img src="images/zonal_officer.png" alt="Zonal Officer" class="dept-card-photo" loading="lazy" />
+          <div class="dept-card-info">
+            <div class="dept-card-role" data-i18n="dept.zonalOfficer">Zonal Officer</div>
+            <div class="dept-card-name" data-i18n="dept.zonalOfficerName">Shri Pradeep Mishra</div>
+            <div class="dept-card-desig" data-i18n="dept.zonalOfficerDesig">Zonal Engineer, Road Maintenance</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FAQ Section ──────────────────────────────────────────── -->
+    <div class="faq-section">
+      <div class="section-header">
+        <div class="section-header-icon" aria-hidden="true">❓</div>
+        <h2 data-i18n="faq.title">Frequently Asked Questions</h2>
+        <p data-i18n="faq.subtitle">Get answers to common queries about the MCL Road Grievance Portal</p>
+        <div class="section-divider"></div>
+      </div>
+
+      <div class="faq-list" id="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span data-i18n="faq.q1">How do I report a pothole?</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" data-i18n="faq.a1">Click "Report a Pothole" in the navigation bar, login with your mobile number or continue as guest, then pin the location on the map, upload a photo, select severity level, and submit. You'll receive a unique Ticket ID for tracking.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span data-i18n="faq.q2">How long does it take to repair a pothole?</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" data-i18n="faq.a2">As per MCL SLA commitments: Critical potholes — 48 hours, High severity — 7 working days, Medium severity — 15 working days, Low severity — 30 working days. Escalation occurs automatically after 30 days.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span data-i18n="faq.q3">Can I track my complaint status?</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" data-i18n="faq.a3">Yes! Use the "Track Report" option in the navigation bar and enter your Complaint Ticket ID (e.g., POT-0001). You can also search by area or address on the map.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span data-i18n="faq.q4">What happens if my complaint is not resolved in time?</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" data-i18n="faq.a4">Complaints pending for more than 30 days are automatically escalated to Senior Officers of the Roads Department. You can also file an RTI request for status updates.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span data-i18n="faq.q5">Can I report anonymously?</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" data-i18n="faq.a5">Yes, you can continue as a guest without providing personal details. However, logged-in users can track their specific reports and receive status updates via notifications.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span data-i18n="faq.q6">Is this portal available in Hindi?</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" data-i18n="faq.a6">Yes! Use the language selector in the top utility bar to switch between English and Hindi. The entire portal content will be translated.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span data-i18n="faq.q7">How do I file an RTI request?</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" data-i18n="faq.a7">You can download RTI application forms from the Downloads section. Submit them to the designated RTI officer at MCL office or use the online RTI portal of Government of India.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span data-i18n="faq.q8">What are the emergency contact numbers?</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" data-i18n="faq.a8">MCL Control Room: 0522-2630-1234, Emergency Road Repair: 1800-180-5555 (Toll-free), WhatsApp Helpline: +91-9876-543-210.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Feedback Section ──────────────────────────────────────── -->
+    <div class="feedback-section" id="feedback-section">
+      <h3 data-i18n="feedback.title">Rate Our Service</h3>
+      <p data-i18n="feedback.subtitle">How satisfied are you with the MCL Grievance Portal?</p>
+      <div class="feedback-stars" id="feedback-stars">
+        <button class="feedback-star-btn" data-rating="4" onclick="selectRating(this)">
+          <span class="feedback-star-icon">😍</span>
+          <span class="feedback-star-label" data-i18n="feedback.excellent">Excellent</span>
+        </button>
+        <button class="feedback-star-btn" data-rating="3" onclick="selectRating(this)">
+          <span class="feedback-star-icon">😊</span>
+          <span class="feedback-star-label" data-i18n="feedback.good">Good</span>
+        </button>
+        <button class="feedback-star-btn" data-rating="2" onclick="selectRating(this)">
+          <span class="feedback-star-icon">😐</span>
+          <span class="feedback-star-label" data-i18n="feedback.average">Average</span>
+        </button>
+        <button class="feedback-star-btn" data-rating="1" onclick="selectRating(this)">
+          <span class="feedback-star-icon">😞</span>
+          <span class="feedback-star-label" data-i18n="feedback.poor">Poor</span>
+        </button>
+      </div>
+      <button class="feedback-submit-btn" id="feedback-submit-btn" onclick="submitFeedback()" data-i18n="feedback.submit">Submit Feedback</button>
+      <div class="feedback-thanks" id="feedback-thanks" data-i18n="feedback.thanks">Thank you for your feedback!</div>
+    </div>
+
+    <!-- ── Services Footer ──────────────────────────────────────── -->
+    <div class="services-footer">
+      <p>
+        <span data-i18n="footer.content">Content owned & maintained by MCL, Govt. of Uttar Pradesh</span><br>
+        <span data-i18n="footer.design">Designed & hosted by NIC UP State Centre</span><br>
+        <a href="#" data-i18n="footer.terms">Terms of Use</a> |
+        <a href="#" data-i18n="footer.privacy">Privacy Policy</a> |
+        <a href="#" data-i18n="footer.accessibility">Accessibility Statement</a><br>
+        <span data-i18n="footer.lastUpdated">Last Updated: August 2025</span>
+      </p>
+    </div>
+
+  </div><!-- /services-inner -->
+</div><!-- /services-section -->
+</div><!-- /view-citizen-services -->
+
+<!-- ═══ CITIZEN ABOUT VIEW ═════════════════════════════════════ -->
+<div class="dashboard-view" id="view-citizen-about">
+<div class="fullpage-section active" id="about-page" style="position:relative;display:block;">
+  <div class="fullpage-inner">
+    <button class="btn-back-map" onclick="closeAllPages()">← <span data-i18n="bc.home">Home</span> / <span data-i18n="map.legend">Map</span></button>
+
+    <div class="section-header">
+      <div class="section-header-icon" aria-hidden="true">ℹ️</div>
+      <h2>About the Portal</h2>
+      <p>MCL Pothole Grievance Reporting & Tracking System — Empowering Citizens for Better Roads</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="about-hero-card">
+      <div class="about-hero-icon">🏛️</div>
+      <h3>Our Mission</h3>
+      <p>The Municipal Corporation of Lucknow (MCL) Pothole Grievance Portal is an e-Governance initiative under the Government of Uttar Pradesh to empower citizens with a transparent, accountable, and technology-driven platform for reporting and tracking road infrastructure issues.</p>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="about-card-icon">🎯</div>
+        <h4>Vision</h4>
+        <p>A Lucknow with smooth, safe, and well-maintained roads for every citizen — powered by technology and civic participation.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-card-icon">📊</div>
+        <h4>Transparency</h4>
+        <p>Every complaint is tracked with a unique Ticket ID. Real-time status updates ensure complete transparency from reporting to resolution.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-card-icon">⚡</div>
+        <h4>Speed</h4>
+        <p>GPS-enabled location pinning, photo evidence, and automated severity classification enable faster response and repair scheduling.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-card-icon">🤝</div>
+        <h4>Accountability</h4>
+        <p>Auto-escalation after 30 days of inaction ensures no complaint goes unresolved. Senior officers are notified automatically.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-card-icon">🌐</div>
+        <h4>Bilingual Access</h4>
+        <p>Full Hindi and English language support ensures every citizen of Lucknow can access and use this portal comfortably.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-card-icon">♿</div>
+        <h4>GIGW Compliant</h4>
+        <p>Fully compliant with Government of India Guidelines for Indian Government Websites (GIGW) — accessibility, standards, and security.</p>
+      </div>
+    </div>
+
+    <!-- How it Works -->
+    <div class="about-process-section">
+      <h3>How It Works</h3>
+      <div class="about-process-grid">
+        <div class="about-step">
+          <div class="about-step-num">1</div>
+          <div class="about-step-icon">📍</div>
+          <h4>Report</h4>
+          <p>Click "Report a Pothole", pin location on map, upload photo, and submit your complaint.</p>
+        </div>
+        <div class="about-step-arrow">→</div>
+        <div class="about-step">
+          <div class="about-step-num">2</div>
+          <div class="about-step-icon">🔍</div>
+          <h4>Review</h4>
+          <p>MCL engineers review the complaint, assess severity, and schedule repair work.</p>
+        </div>
+        <div class="about-step-arrow">→</div>
+        <div class="about-step">
+          <div class="about-step-num">3</div>
+          <div class="about-step-icon">🔧</div>
+          <h4>Repair</h4>
+          <p>Assigned repair crew fixes the pothole. Status updates are provided in real-time.</p>
+        </div>
+        <div class="about-step-arrow">→</div>
+        <div class="about-step">
+          <div class="about-step-num">4</div>
+          <div class="about-step-icon">✅</div>
+          <h4>Resolved</h4>
+          <p>Complaint marked resolved after verification. Before/after photos uploaded as proof.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Technology -->
+    <div class="about-tech-card">
+      <h3>🛠️ Technology Stack</h3>
+      <div class="about-tech-grid">
+        <div class="about-tech-item"><span>📡</span> GPS-enabled Location Tracking</div>
+        <div class="about-tech-item"><span>🗺️</span> Interactive Map (Leaflet.js)</div>
+        <div class="about-tech-item"><span>📱</span> Mobile-First Responsive Design</div>
+        <div class="about-tech-item"><span>🔐</span> Aadhaar / OTP Authentication</div>
+        <div class="about-tech-item"><span>📸</span> Photo Evidence Upload</div>
+        <div class="about-tech-item"><span>🔄</span> Real-time Status Tracking</div>
+        <div class="about-tech-item"><span>🌐</span> Offline-first PWA Architecture</div>
+        <div class="about-tech-item"><span>🤖</span> AI Duplicate Detection</div>
+      </div>
+    </div>
+
+    <div class="fullpage-footer">
+      <p>Content owned & maintained by MCL, Govt. of Uttar Pradesh<br>
+      Designed & hosted by NIC UP State Centre<br>
+      <a href="#">Terms of Use</a> | <a href="#">Privacy Policy</a> | <a href="#">Accessibility Statement</a><br>
+      Last Updated: August 2025</p>
+    </div>
+  </div>
+</div>
+</div><!-- /view-citizen-about -->
+
+<!-- ═══ CITIZEN TRACK VIEW ═════════════════════════════════════ -->
+<div class="dashboard-view" id="view-citizen-track">
+<div class="fullpage-section active" id="track-page" style="position:relative;display:block;">
+  <div class="fullpage-inner">
+    <button class="btn-back-map" onclick="Dashboard.showView('citizen-home');document.querySelectorAll('.sidebar-nav-item').forEach(n=>n.classList.remove('active'));document.querySelector('.sidebar-nav-item[data-view=citizen-home]').classList.add('active');">← <span data-i18n="bc.home">Home</span> / <span data-i18n="map.legend">Map</span></button>
+
+    <div class="section-header">
+      <div class="section-header-icon" aria-hidden="true">🔍</div>
+      <h2>Track Your Complaint</h2>
+      <p>Enter your Complaint Ticket ID to check real-time status and progress updates</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- Search Box -->
+    <div class="track-search-box">
+      <div class="track-search-icon">🎫</div>
+      <h3>Enter Complaint Ticket ID</h3>
+      <div class="track-search-row">
+        <input type="text" class="track-search-input" id="track-ticket-input" placeholder="e.g., POT-0001, POT-0002…" />
+        <button class="track-search-btn" id="track-search-btn" onclick="searchTicket()">🔍 Track</button>
+      </div>
+      <p class="track-search-hint">Your Ticket ID was provided at the time of complaint submission. Check your SMS or notification history.</p>
+    </div>
+
+    <!-- Track Result (hidden by default) -->
+    <div class="track-result" id="track-result" style="display:none;">
+      <div class="track-result-header">
+        <div class="track-result-ticket" id="track-result-ticket">POT-0000</div>
+        <div class="track-result-status" id="track-result-status">Pending</div>
+      </div>
+      <div class="track-result-grid">
+        <div class="track-detail-item">
+          <span class="track-detail-label">📍 Location</span>
+          <span class="track-detail-value" id="track-result-location">—</span>
+        </div>
+        <div class="track-detail-item">
+          <span class="track-detail-label">📅 Date Filed</span>
+          <span class="track-detail-value" id="track-result-date">—</span>
+        </div>
+        <div class="track-detail-item">
+          <span class="track-detail-label">⚠️ Severity</span>
+          <span class="track-detail-value" id="track-result-severity">—</span>
+        </div>
+        <div class="track-detail-item">
+          <span class="track-detail-label">🗺️ Zone</span>
+          <span class="track-detail-value" id="track-result-zone">—</span>
+        </div>
+        <div class="track-detail-item">
+          <span class="track-detail-label">👤 Reporter</span>
+          <span class="track-detail-value" id="track-result-reporter">—</span>
+        </div>
+        <div class="track-detail-item">
+          <span class="track-detail-label">👍 Upvotes</span>
+          <span class="track-detail-value" id="track-result-votes">—</span>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="track-timeline">
+        <h4>📋 Complaint Timeline</h4>
+        <div class="timeline-steps" id="track-timeline-steps">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <button class="track-view-map-btn" id="track-view-map-btn" onclick="viewOnMap()">🗺️ View on Map</button>
+    </div>
+
+    <!-- Recent Complaints Overview -->
+    <div class="track-recent-section">
+      <h3>📋 All Active Complaints</h3>
+      <p>Overview of all complaints currently in the system</p>
+      <div class="track-table-wrapper">
+        <table class="track-table" id="track-complaints-table">
+          <thead>
+            <tr>
+              <th>Ticket ID</th>
+              <th>Location</th>
+              <th>Severity</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="track-table-body">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="fullpage-footer">
+      <p>Content owned & maintained by MCL, Govt. of Uttar Pradesh<br>
+      Designed & hosted by NIC UP State Centre<br>
+      Last Updated: August 2025</p>
+    </div>
+  </div>
+</div>
+</div><!-- /view-citizen-track -->
+
+<!-- ═══ CITIZEN RTI VIEW ═══════════════════════════════════════ -->
+<div class="dashboard-view" id="view-citizen-rti">
+<div class="fullpage-section active" id="rti-page" style="position:relative;display:block;">
+  <div class="fullpage-inner">
+    <button class="btn-back-map" onclick="Dashboard.showView('citizen-home');document.querySelectorAll('.sidebar-nav-item').forEach(n=>n.classList.remove('active'));document.querySelector('.sidebar-nav-item[data-view=citizen-home]').classList.add('active');">← <span data-i18n="bc.home">Home</span> / <span data-i18n="map.legend">Map</span></button>
+
+    <div class="section-header">
+      <div class="section-header-icon" aria-hidden="true">📄</div>
+      <h2>Right to Information (RTI)</h2>
+      <p>File RTI requests regarding road infrastructure, repairs, and expenditure under the RTI Act, 2005</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- RTI Info Card -->
+    <div class="rti-hero-card">
+      <div class="rti-hero-badge">RTI Act 2005</div>
+      <h3>🏛️ Right to Information Act, 2005</h3>
+      <p>Every citizen of India has the right to seek information from public authorities. Under Section 6 of the RTI Act, any citizen can request information held by or under the control of any public authority. MCL Roads Department is committed to providing transparent and timely responses to all RTI applications.</p>
+    </div>
+
+    <div class="rti-grid">
+      <!-- PIO Info -->
+      <div class="rti-card rti-card-officer">
+        <div class="rti-card-icon">👤</div>
+        <h4>Public Information Officer (PIO)</h4>
+        <div class="rti-officer-info">
+          <div class="rti-info-row"><strong>Name:</strong> Shri Rajesh Kumar Singh</div>
+          <div class="rti-info-row"><strong>Designation:</strong> Assistant Engineer, Roads Dept.</div>
+          <div class="rti-info-row"><strong>📞 Phone:</strong> 0522-2630-5678</div>
+          <div class="rti-info-row"><strong>📧 Email:</strong> rti-roads@lucknow.gov.in</div>
+          <div class="rti-info-row"><strong>🏢 Office:</strong> MCL Head Office, Lalbagh, Lucknow</div>
+          <div class="rti-info-row"><strong>🕐 Hours:</strong> Mon–Fri, 10:00 AM – 5:00 PM</div>
+        </div>
+      </div>
+
+      <!-- Appellate Authority -->
+      <div class="rti-card rti-card-appellate">
+        <div class="rti-card-icon">⚖️</div>
+        <h4>First Appellate Authority</h4>
+        <div class="rti-officer-info">
+          <div class="rti-info-row"><strong>Name:</strong> Shri R.K. Srivastava</div>
+          <div class="rti-info-row"><strong>Designation:</strong> Chief Engineer (Roads)</div>
+          <div class="rti-info-row"><strong>📞 Phone:</strong> 0522-2630-1234</div>
+          <div class="rti-info-row"><strong>📧 Email:</strong> ce-roads@lucknow.gov.in</div>
+          <div class="rti-info-row"><strong>🏢 Office:</strong> MCL Head Office, Lalbagh, Lucknow</div>
+          <div class="rti-info-row"><strong>🕐 Hours:</strong> Mon–Fri, 10:00 AM – 5:00 PM</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to file RTI -->
+    <div class="rti-process-section">
+      <h3>📝 How to File an RTI Application</h3>
+      <div class="rti-steps-grid">
+        <div class="rti-step-card">
+          <div class="rti-step-num">1</div>
+          <h4>Prepare Application</h4>
+          <p>Write your RTI application in English or Hindi on plain paper. Mention clearly: (i) Subject, (ii) Information sought, (iii) Period of information.</p>
+        </div>
+        <div class="rti-step-card">
+          <div class="rti-step-num">2</div>
+          <h4>Pay Application Fee</h4>
+          <p>Attach ₹10 as application fee via IPO / Demand Draft / Court Fee Stamp payable to "Municipal Commissioner, MCL, Lucknow".</p>
+        </div>
+        <div class="rti-step-card">
+          <div class="rti-step-num">3</div>
+          <h4>Submit Application</h4>
+          <p>Submit by post or in person at MCL office, or online via the central RTI portal: <strong>rtionline.gov.in</strong></p>
+        </div>
+        <div class="rti-step-card">
+          <div class="rti-step-num">4</div>
+          <h4>Receive Response</h4>
+          <p>PIO will respond within <strong>30 days</strong> of receipt. If unsatisfied, file first appeal within 30 days.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RTI FAQs -->
+    <div class="rti-faq-section">
+      <h3>❓ RTI — Frequently Asked Questions</h3>
+      <div class="rti-faq-list">
+        <div class="rti-faq-item">
+          <div class="rti-faq-q">What information can I seek under RTI?</div>
+          <div class="rti-faq-a">You can seek any information that is held by MCL Roads Department — road construction budgets, repair expenditures, contractor details, timeline records, audit reports, etc.</div>
+        </div>
+        <div class="rti-faq-item">
+          <div class="rti-faq-q">Is BPL category exempt from fees?</div>
+          <div class="rti-faq-a">Yes. Citizens below the poverty line (BPL) are exempt from RTI application fees. Attach a BPL certificate with your application.</div>
+        </div>
+        <div class="rti-faq-item">
+          <div class="rti-faq-q">Can I file RTI online?</div>
+          <div class="rti-faq-a">Yes. Use the Government of India's RTI Online Portal at <strong>rtionline.gov.in</strong> for online submissions and tracking.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fullpage-footer">
+      <p>Content owned & maintained by MCL, Govt. of Uttar Pradesh<br>
+      Designed & hosted by NIC UP State Centre<br>
+      Last Updated: August 2025</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /view-citizen-rti -->
+
+<!-- ═══ CITIZEN DOWNLOADS VIEW ═════════════════════════════════ -->
+<div class="dashboard-view" id="view-citizen-downloads">
+<div class="fullpage-section active" id="downloads-page" style="position:relative;display:block;">
+  <div class="fullpage-inner">
+    <button class="btn-back-map" onclick="Dashboard.showView('citizen-home');document.querySelectorAll('.sidebar-nav-item').forEach(n=>n.classList.remove('active'));document.querySelector('.sidebar-nav-item[data-view=citizen-home]').classList.add('active');">← <span data-i18n="bc.home">Home</span> / <span data-i18n="map.legend">Map</span></button>
+
+    <div class="section-header">
+      <div class="section-header-icon" aria-hidden="true">⬇️</div>
+      <h2>Downloads</h2>
+      <p>Download official forms, circulars, guidelines, and reports from MCL Roads Department</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- Downloads Categories -->
+    <div class="downloads-grid">
+      <!-- Forms -->
+      <div class="download-category-card">
+        <div class="download-cat-header">
+          <span class="download-cat-icon">📝</span>
+          <h4>Application Forms</h4>
+        </div>
+        <div class="download-list">
+          <div class="download-item">
+            <div class="download-item-icon">📄</div>
+            <div class="download-item-info">
+              <div class="download-item-name">RTI Application Form</div>
+              <div class="download-item-meta">PDF • 245 KB • Last updated: July 2025</div>
+            </div>
+            <button class="download-item-btn" onclick="Toast.show('📥 Download started — RTI Application Form', 'success', 3000)">⬇️ Download</button>
+          </div>
+          <div class="download-item">
+            <div class="download-item-icon">📄</div>
+            <div class="download-item-info">
+              <div class="download-item-name">Road Damage Complaint Form (Offline)</div>
+              <div class="download-item-meta">PDF • 180 KB • Last updated: June 2025</div>
+            </div>
+            <button class="download-item-btn" onclick="Toast.show('📥 Download started — Complaint Form', 'success', 3000)">⬇️ Download</button>
+          </div>
+          <div class="download-item">
+            <div class="download-item-icon">📄</div>
+            <div class="download-item-info">
+              <div class="download-item-name">NOC for Road Cutting / Excavation</div>
+              <div class="download-item-meta">PDF • 310 KB • Last updated: May 2025</div>
+            </div>
+            <button class="download-item-btn" onclick="Toast.show('📥 Download started — NOC Form', 'success', 3000)">⬇️ Download</button>
+          </div>
+          <div class="download-item">
+            <div class="download-item-icon">📄</div>
+            <div class="download-item-info">
+              <div class="download-item-name">Road Permit Application (Heavy Vehicles)</div>
+              <div class="download-item-meta">PDF • 195 KB • Last updated: April 2025</div>
+            </div>
+            <button class="download-item-btn" onclick="Toast.show('📥 Download started — Permit Form', 'success', 3000)">⬇️ Download</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Circulars & Orders -->
+      <div class="download-category-card">
+        <div class="download-cat-header">
+          <span class="download-cat-icon">📢</span>
+          <h4>Government Circulars & Orders</h4>
+        </div>
+        <div class="download-list">
+          <div class="download-item">
+            <div class="download-item-icon">📋</div>
+            <div class="download-item-info">
+              <div class="download-item-name">MCL Road Repair SLA Policy (2025)</div>
+              <div class="download-item-meta">PDF • 520 KB • Issued: March 2025</div>
+            </div>
+            <button class="download-item-btn" onclick="Toast.show('📥 Download started — SLA Policy', 'success', 3000)">⬇️ Download</button>
+          </div>
+          <div class="download-item">
+            <div class="download-item-icon">📋</div>
+            <div class="download-item-info">
+              <div class="download-item-name">Monsoon Road Maintenance Guidelines</div>
+              <div class="download-item-meta">PDF • 680 KB • Issued: June 2025</div>
+            </div>
+            <button class="download-item-btn" onclick="Toast.show('📥 Download started — Monsoon Guidelines', 'success', 3000)">⬇️ Download</button>
+          </div>
+          <div class="download-item">
+            <div class="download-item-icon">📋</div>
+            <div class="download-item-info">
+              <div class="download-item-name">Annual Road Infrastructure Report 2024–25</div>
+              <div class="download-item-meta">PDF • 2.4 MB • Published: April 2025</div>
+            </div>
+            <button class="download-item-btn" onclick="Toast.show('📥 Download started — Annual Report', 'success', 3000)">⬇️ Download</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manuals & Guidelines -->
+      <div class="download-category-card">
+        <div class="download-cat-header">
+          <span class="download-cat-icon">📚</span>
+          <h4>Manuals & User Guides</h4>
+        </div>
+        <div class="download-list">
+          <div class="download-item">
+            <div class="download-item-icon">📘</div>
+            <div class="download-item-info">
+              <div class="download-item-name">Citizen Portal User Manual</div>
+              <div class="download-item-meta">PDF • 1.2 MB • Version: 2.0</div>
+            </div>
+            <button class="download-item-btn" onclick="Toast.show('📥 Download started — User Manual', 'success', 3000)">⬇️ Download</button>
+          </div>
+          <div class="download-item">
+            <div class="download-item-icon">📘</div>
+            <div class="download-item-info">
+              <div class="download-item-name">Road Safety Audit Handbook (IRC SP-88)</div>
+              <div class="download-item-meta">PDF • 3.1 MB • Edition: 2024</div>
+            </div>
+            <button class="download-item-btn" onclick="Toast.show('📥 Download started — Safety Handbook', 'success', 3000)">⬇️ Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fullpage-footer">
+      <p>Content owned & maintained by MCL, Govt. of Uttar Pradesh<br>
+      Designed & hosted by NIC UP State Centre<br>
+      Last Updated: August 2025</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /view-citizen-downloads -->
+
+<!-- ═══ CITIZEN CONTACT VIEW ═══════════════════════════════════ -->
+<div class="dashboard-view" id="view-citizen-contact">
+<div class="fullpage-section active" id="contact-page" style="position:relative;display:block;">
+  <div class="fullpage-inner">
+    <button class="btn-back-map" onclick="Dashboard.showView('citizen-home');document.querySelectorAll('.sidebar-nav-item').forEach(n=>n.classList.remove('active'));document.querySelector('.sidebar-nav-item[data-view=citizen-home]').classList.add('active');">← <span data-i18n="bc.home">Home</span> / <span data-i18n="map.legend">Map</span></button>
+
+    <div class="section-header">
+      <div class="section-header-icon" aria-hidden="true">📞</div>
+      <h2>Contact Us</h2>
+      <p>Get in touch with MCL Roads Department — Helpline, Email, Office Locations & Emergency Numbers</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- Emergency Banner -->
+    <div class="contact-emergency-banner">
+      <div class="contact-emergency-icon">🚨</div>
+      <div class="contact-emergency-content">
+        <h3>Emergency Road Hazard?</h3>
+        <p>For immediate road emergencies (cave-ins, road collapses, major accidents due to potholes), call our 24/7 emergency helpline:</p>
+        <div class="contact-emergency-numbers">
+          <a href="tel:052226301234" class="emergency-num-btn">📞 0522-2630-1234</a>
+          <a href="tel:18001805555" class="emergency-num-btn toll-free">📞 1800-180-5555 (Toll-Free)</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-grid">
+      <!-- Grievance Officer -->
+      <div class="contact-card contact-card-primary">
+        <div class="contact-card-icon">👤</div>
+        <h4>Grievance Officer</h4>
+        <div class="contact-info-list">
+          <div class="contact-info-item"><span class="ci-label">Name:</span> <strong>Sh. Anil Kumar Verma</strong></div>
+          <div class="contact-info-item"><span class="ci-label">Designation:</span> Executive Engineer (Roads), MCL</div>
+          <div class="contact-info-item"><span class="ci-label">📞 Phone:</span> <a href="tel:052226301234">0522-2630-1234</a></div>
+          <div class="contact-info-item"><span class="ci-label">📧 Email:</span> <a href="mailto:rti-mcl-roads@lucknow.gov.in">rti-mcl-roads@lucknow.gov.in</a></div>
+          <div class="contact-info-item"><span class="ci-label">🕐 Timings:</span> Mon–Sat, 10:00 AM – 5:00 PM</div>
+        </div>
+      </div>
+
+      <!-- MCL Head Office -->
+      <div class="contact-card">
+        <div class="contact-card-icon">🏢</div>
+        <h4>MCL Head Office</h4>
+        <div class="contact-info-list">
+          <div class="contact-info-item"><span class="ci-label">Address:</span> Nagar Nigam Bhawan, Lalbagh, Lucknow — 226001</div>
+          <div class="contact-info-item"><span class="ci-label">📞 Phone:</span> <a href="tel:05222620170">0522-2620-170</a></div>
+          <div class="contact-info-item"><span class="ci-label">📠 Fax:</span> 0522-2620-171</div>
+          <div class="contact-info-item"><span class="ci-label">📧 Email:</span> <a href="mailto:mcl@lucknow.gov.in">mcl@lucknow.gov.in</a></div>
+          <div class="contact-info-item"><span class="ci-label">🕐 Office Hours:</span> Mon–Sat, 10:00 AM – 5:00 PM</div>
+        </div>
+      </div>
+
+      <!-- WhatsApp Helpline -->
+      <div class="contact-card contact-card-whatsapp">
+        <div class="contact-card-icon">💬</div>
+        <h4>WhatsApp Helpline</h4>
+        <div class="contact-info-list">
+          <div class="contact-info-item"><span class="ci-label">Number:</span> <strong>+91-9876-543-210</strong></div>
+          <div class="contact-info-item"><span class="ci-label">Service:</span> Send pothole photo + location for instant complaint registration</div>
+          <div class="contact-info-item"><span class="ci-label">⏰ Available:</span> 24/7 automated response</div>
+        </div>
+        <a href="https://wa.me/919876543210" target="_blank" class="contact-wa-btn">💬 Chat on WhatsApp</a>
+      </div>
+
+      <!-- Control Room -->
+      <div class="contact-card">
+        <div class="contact-card-icon">🎛️</div>
+        <h4>MCL Control Room</h4>
+        <div class="contact-info-list">
+          <div class="contact-info-item"><span class="ci-label">📞 24/7 Helpline:</span> <a href="tel:052226301234"><strong>0522-2630-1234</strong></a></div>
+          <div class="contact-info-item"><span class="ci-label">📞 Toll-Free:</span> <a href="tel:18001805555"><strong>1800-180-5555</strong></a></div>
+          <div class="contact-info-item"><span class="ci-label">Service:</span> Road emergency, pothole reporting, status enquiry</div>
+          <div class="contact-info-item"><span class="ci-label">Languages:</span> Hindi & English</div>
+        </div>
+      </div>
+
+      <!-- Online Resources -->
+      <div class="contact-card contact-card-online">
+        <div class="contact-card-icon">🌐</div>
+        <h4>Online Resources</h4>
+        <div class="contact-info-list">
+          <div class="contact-info-item"><span class="ci-label">🌐 MCL Website:</span> <a href="#">www.nagarnigamlko.com</a></div>
+          <div class="contact-info-item"><span class="ci-label">📱 CM Helpline:</span> <a href="tel:1076"><strong>1076</strong></a></div>
+          <div class="contact-info-item"><span class="ci-label">🏛️ IGRS Portal:</span> <a href="#">jansunwai.up.nic.in</a></div>
+          <div class="contact-info-item"><span class="ci-label">📄 RTI Online:</span> <a href="#">rtionline.gov.in</a></div>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="contact-card contact-card-feedback">
+        <div class="contact-card-icon">📝</div>
+        <h4>Send Feedback</h4>
+        <div class="contact-feedback-form">
+          <input type="text" class="contact-form-input" placeholder="Your Name" id="contact-name" />
+          <input type="email" class="contact-form-input" placeholder="Email Address" id="contact-email" />
+          <textarea class="contact-form-textarea" placeholder="Your message or feedback…" rows="3" id="contact-message"></textarea>
+          <button class="contact-form-submit" onclick="submitContactForm()">📤 Send Message</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fullpage-footer">
+      <p>Content owned & maintained by MCL, Govt. of Uttar Pradesh<br>
+      Designed & hosted by NIC UP State Centre<br>
+      Last Updated: August 2025</p>
+    </div>
+  </div>
+</div>
+</div><!-- /view-citizen-contact -->
+
+<!-- ═══ UNIFIED OFFICER WORKSPACE ═══════════════════════════════ -->
+<div class="unified-admin-workspace" id="unified-admin-workspace">
+  <div class="admin-topbar unified-admin-topbar">
+    <div class="admin-topbar-title"><span aria-hidden="true">📋</span><span id="unified-topbar-title">Complaint Board</span></div>
+    <div class="admin-topbar-actions">
+      <span id="session-timer" style="font-size:10px;color:#8892B0;margin-right:8px"></span>
+      <span id="sse-status" style="font-size:10px;margin-right:8px;color:#10B981">● Live</span>
+      <button class="btn-action" id="btn-refresh">🔄 Refresh</button>
+      <button class="btn-action" id="btn-export">📊 Export CSV</button>
+      <button class="btn-action primary" id="btn-print">🖨️ Print / PDF</button>
+    </div>
+  </div>
+
+  <div class="dashboard-view admin-view" id="view-admin-kanban">
+    <div class="admin-content">
+      <div class="stats-grid">
+        <div class="stat-card card-pending"><div class="stat-card-icon">🔴</div><div class="stat-card-value" id="sc-pending">0</div><div class="stat-card-label">Pending</div></div>
+        <div class="stat-card card-scheduled"><div class="stat-card-icon">🟡</div><div class="stat-card-value" id="sc-scheduled">0</div><div class="stat-card-label">Scheduled</div></div>
+        <div class="stat-card card-progress"><div class="stat-card-icon">🔵</div><div class="stat-card-value" id="sc-progress">0</div><div class="stat-card-label">In Progress</div></div>
+        <div class="stat-card card-resolved"><div class="stat-card-icon">🟢</div><div class="stat-card-value" id="sc-resolved">0</div><div class="stat-card-label">Resolved</div></div>
+        <div class="stat-card card-total"><div class="stat-card-icon">📊</div><div class="stat-card-value" id="sc-total">0</div><div class="stat-card-label">Total Complaints</div></div>
+        <div class="stat-card card-escalated"><div class="stat-card-icon">⚠️</div><div class="stat-card-value" id="sc-escalated">0</div><div class="stat-card-label">Escalated</div></div>
+      </div>
+      <div class="kanban-header"><div class="kanban-title">📋 Complaint Management Board</div><select class="sort-select" id="sort-select"><option value="upvotes">👍 Most Upvoted</option><option value="severity">⚠️ Highest Severity</option><option value="date">📅 Newest First</option><option value="escalated">🚨 Escalated First</option></select></div>
+      <div class="kanban-board">
+        <div class="kanban-column col-pending"><div class="kanban-col-header"><span>Pending</span><span id="count-pending">0</span></div><div class="kanban-col-body" id="col-pending"></div></div>
+        <div class="kanban-column col-scheduled"><div class="kanban-col-header"><span>Scheduled</span><span id="count-scheduled">0</span></div><div class="kanban-col-body" id="col-scheduled"></div></div>
+        <div class="kanban-column col-progress"><div class="kanban-col-header"><span>In Progress</span><span id="count-in-progress">0</span></div><div class="kanban-col-body" id="col-in-progress"></div></div>
+        <div class="kanban-column col-resolved"><div class="kanban-col-header"><span>Resolved</span><span id="count-resolved">0</span></div><div class="kanban-col-body" id="col-resolved"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-view admin-view" id="view-admin-workers"><div class="admin-content"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h2>👷 Worker Management & Assignment</h2><button class="btn-action primary" id="btn-add-worker">➕ Add Worker</button></div><div class="worker-stats-row"><div class="worker-stat-card"><div class="worker-stat-value" id="ws-total">0</div><div class="worker-stat-label">Total Workers</div></div><div class="worker-stat-card"><div class="worker-stat-value" id="ws-available">0</div><div class="worker-stat-label">Available</div></div><div class="worker-stat-card"><div class="worker-stat-value" id="ws-busy">0</div><div class="worker-stat-label">On Assignment</div></div><div class="worker-stat-card"><div class="worker-stat-value" id="ws-completed">0</div><div class="worker-stat-label">Completed</div></div></div><div class="workers-table-wrap"><table class="workers-table"><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Specialization</th><th>Status</th><th>Current Job</th><th>Completed</th><th>Actions</th></tr></thead><tbody id="workers-tbody"></tbody></table></div><div style="margin-top:24px"><h3>⚡ Quick Assign Worker</h3><div class="quick-assign-form"><select class="qa-select" id="qa-report-select"><option value="">Select Complaint…</option></select><select class="qa-select" id="qa-worker-select"><option value="">Select Worker…</option></select><input class="qa-input" id="qa-resources" placeholder="Resources (Asphalt, JCB, 5 workers)"/><button class="btn-action primary" id="btn-quick-assign">🔗 Assign</button></div></div><div style="margin-top:24px"><h3>📸 Upload Repair Photo</h3><div class="quick-assign-form"><select class="qa-select" id="photo-report-select"><option value="">Select Assigned Complaint…</option></select><input class="qa-input" id="worker-photo-input" type="file" accept="image/*" capture="environment"/><button class="btn-action primary" id="btn-worker-photo">📤 Upload Photo</button></div></div></div></div>
+
+  <div class="dashboard-view admin-view" id="view-admin-verification"><div class="admin-content"><h2>📸 Worker Photo Verification</h2><p class="admin-panel-note">Compare the complaint photo with the worker repair photo, then decide whether the work is resolved, in progress, or unresolved.</p><div id="verification-list"></div></div></div>
+
+  <div class="dashboard-view admin-view" id="view-admin-analytics"><div class="admin-content"><div class="kpi-row"><div class="kpi-card"><div class="kpi-value" id="kpi-total">0</div><div class="kpi-label">Total Complaints</div></div><div class="kpi-card"><div class="kpi-value" id="kpi-resolved">0</div><div class="kpi-label">Resolved</div></div><div class="kpi-card"><div class="kpi-value" id="kpi-avgdays">—</div><div class="kpi-label">Avg. Resolution (days)</div></div><div class="kpi-card"><div class="kpi-value" id="kpi-rate">0%</div><div class="kpi-label">Resolution Rate</div></div></div><div class="analytics-grid"><div class="analytics-card"><div class="analytics-card-title">🗺️ Complaints by Zone</div><div class="chart-wrapper"><canvas id="zone-chart"></canvas></div></div><div class="analytics-card"><div class="analytics-card-title">⚠️ Severity Breakdown</div><div class="chart-wrapper"><canvas id="severity-chart"></canvas></div></div><div class="analytics-card wide"><div class="analytics-card-title">📈 Monthly Complaint Trend</div><div class="chart-wrapper"><canvas id="monthly-chart"></canvas></div></div><div class="analytics-card"><div class="analytics-card-title">🛣️ Road Type</div><div class="chart-wrapper"><canvas id="roadtype-chart"></canvas></div></div><div class="analytics-card"><div class="analytics-card-title">🏆 Affected Zones</div><table class="zones-table"><tbody id="zones-tbody"></tbody></table></div></div></div></div>
+
+  <div class="dashboard-view admin-view" id="view-admin-escalated"><div class="admin-content"><h2>⚠️ Escalated Complaints</h2><p class="admin-panel-note">Reports older than 30 days requiring senior officer attention.</p><div id="escalated-list"></div></div></div>
+  <div class="dashboard-view admin-view" id="view-admin-errors"><div class="admin-content"><h2>🐛 Error Logs <span id="error-count">(0)</span></h2><div id="error-log-list"></div></div></div>
+  <div class="dashboard-view admin-view" id="view-admin-audit"><div class="admin-content"><h2>📜 Audit Trail <span id="audit-count">(0)</span></h2><div id="audit-log-list"></div></div></div>
+</div>
+
+<!-- Unified officer workflow modals -->
+<div class="modal-overlay" id="resolve-modal"><div class="modal"><div class="modal-title">✅ Mark as Resolved</div><div class="modal-desc">Ticket: <strong id="resolve-modal-ticket"></strong><br><span id="resolve-modal-addr"></span></div><div class="modal-upload-area" id="after-photo-area"><div class="modal-upload-icon">📷</div><div class="modal-upload-text">Upload after-repair photo</div></div><input type="file" id="after-photo-input" accept="image/*" style="display:none"/><div class="modal-actions"><button class="btn-modal btn-modal-secondary" id="resolve-modal-cancel">Cancel</button><button class="btn-modal btn-modal-success" id="resolve-confirm-btn">✅ Confirm Resolved</button></div></div></div>
+<div class="modal-overlay" id="add-worker-modal"><div class="modal"><div class="modal-title">👷 Add New Worker</div><div style="padding:16px"><input class="kanban-crew-input" id="new-worker-name" placeholder="Worker name"/><input class="kanban-crew-input" id="new-worker-phone" placeholder="Phone number"/><select class="kanban-status-select" id="new-worker-spec"><option>Pothole Repair</option><option>Road Resurfacing</option><option>Drainage & Waterlogging</option><option>General Maintenance</option><option>Heavy Equipment Operator</option></select></div><div class="modal-actions"><button class="btn-modal btn-modal-secondary" id="add-worker-cancel">Cancel</button><button class="btn-modal btn-modal-success" id="add-worker-confirm">👷 Add Worker</button></div></div></div>
+<div class="modal-overlay" id="photo-compare-modal"><div class="modal" style="max-width:700px"><div class="modal-title">📸 Photo Verification — <span id="compare-ticket-id"></span></div><div class="photo-compare-grid"><div class="photo-compare-card"><div class="photo-compare-label">🔴 BEFORE</div><div class="photo-compare-img" id="compare-before-img"></div></div><div class="photo-compare-card"><div class="photo-compare-label">🟢 AFTER</div><div class="photo-compare-img" id="compare-after-img"></div></div></div><div id="compare-details"></div><div class="modal-actions"><button class="btn-modal btn-modal-secondary" id="compare-close">Close</button><button class="btn-modal" id="compare-reject">❌ Still Unresolved</button><button class="btn-modal" id="compare-progress">🚧 Needs More Work</button><button class="btn-modal btn-modal-success" id="compare-approve">✅ Mark Resolved</button></div></div></div>
+<div class="toast-container" id="admin-toast-container" role="status" aria-live="polite"></div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SERVICE REQUEST MODAL (for new service types)
+══════════════════════════════════════════════════════════════ -->
+<div class="service-modal-overlay" id="service-modal" role="dialog" aria-modal="true" aria-label="Service Request Form">
+  <div class="service-modal">
+    <div class="service-modal-header">
+      <h3 data-i18n="modal.serviceTitle">Submit Service Request</h3>
+      <button class="service-modal-close" onclick="closeServiceModal()">✕</button>
+    </div>
+    <div class="service-modal-body">
+      <div class="svc-form-group">
+        <label class="svc-form-label" data-i18n="modal.serviceType">Service Type</label>
+        <select class="svc-form-select" id="svc-type">
+          <option value="resurfacing" data-i18n="services.resurfacing">Road Resurfacing Request</option>
+          <option value="waterlogging" data-i18n="services.waterlogging">Waterlogging Complaint</option>
+          <option value="traffic" data-i18n="services.traffic">Traffic Signal Issue</option>
+          <option value="tree" data-i18n="services.tree">Tree Hazard / Fallen Tree</option>
+          <option value="streetlight" data-i18n="services.streetlight">Streetlight Complaint</option>
+          <option value="garbage" data-i18n="services.garbage">Solid Waste / Garbage</option>
+          <option value="safety" data-i18n="services.safety">Road Safety Audit</option>
+        </select>
+      </div>
+      <div class="svc-form-group">
+        <label class="svc-form-label" data-i18n="modal.location">Location / Area</label>
+        <input class="svc-form-input" id="svc-location" type="text" data-i18n-placeholder="modal.locationPlaceholder" placeholder="Enter location, street name, or landmark…" />
+      </div>
+      <div class="svc-form-group">
+        <label class="svc-form-label" data-i18n="modal.description">Description</label>
+        <textarea class="svc-form-textarea" id="svc-description" rows="3" data-i18n-placeholder="modal.descPlaceholder" placeholder="Describe the issue in detail…"></textarea>
+      </div>
+      <div class="svc-form-group">
+        <label class="svc-form-label" data-i18n="modal.urgency">Urgency</label>
+        <select class="svc-form-select" id="svc-urgency">
+          <option value="low" data-i18n="modal.urgencyLow">🟢 Low — General maintenance</option>
+          <option value="medium" selected data-i18n="modal.urgencyMedium">🟡 Medium — Needs attention soon</option>
+          <option value="high" data-i18n="modal.urgencyHigh">🟠 High — Urgent, safety concern</option>
+          <option value="critical" data-i18n="modal.urgencyCritical">🔴 Critical — Immediate danger</option>
+        </select>
+      </div>
+    </div>
+    <div class="service-modal-actions">
+      <button class="svc-btn-cancel" onclick="closeServiceModal()" data-i18n="modal.cancel">Cancel</button>
+      <button class="svc-btn-submit" onclick="submitServiceRequest()" data-i18n="modal.submitRequest">📤 Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SOS FLOATING BUTTON & MODAL
+══════════════════════════════════════════════════════════════ -->
+<div class="sos-float" id="sos-float">
+  <button class="sos-btn" onclick="openSOS()" title="Emergency SOS" aria-label="Emergency SOS" data-i18n="sos.btn">🚨 SOS</button>
+</div>
+
+<div class="sos-modal-overlay" id="sos-modal" role="dialog" aria-modal="true" aria-label="Emergency SOS">
+  <div class="sos-modal">
+    <div class="sos-modal-icon">🚨</div>
+    <h3 data-i18n="sos.title">🚨 SOS Helpdesk</h3>
+    <p data-i18n="sos.desc">Ask a general question, check a ticket, or get immediate emergency contact details.</p>
+    <div class="sos-chat" id="sos-chat" aria-live="polite">
+      <div class="sos-chat-message assistant">Hello. I can help with pothole complaints, ticket status, and emergencies.</div>
+    </div>
+    <form class="sos-chat-form" id="sos-chat-form">
+      <input id="sos-chat-input" type="text" placeholder="Ask about a ticket or road emergency…" autocomplete="off" />
+      <button type="submit" aria-label="Send message">Send</button>
+    </form>
+    <div class="sos-actions">
+      <button class="sos-action-btn emergency" onclick="window.location.href='tel:052226301234'" data-i18n="sos.call">📞 Call Emergency: 0522-2630-1234</button>
+      <button class="sos-action-btn whatsapp" onclick="window.open('https://wa.me/919876543210','_blank')" data-i18n="sos.whatsapp">💬 WhatsApp: +91-9876-543-210</button>
+      <button class="sos-action-btn" onclick="closeSOS();handleServiceClick('pothole')" data-i18n="sos.report">📍 File Emergency Report</button>
+    </div>
+    <button class="sos-close-btn" onclick="closeSOS()" data-i18n="sos.close">Close</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     NOTIFICATION PANEL
+══════════════════════════════════════════════════════════════ -->
+<div class="notif-panel" id="notif-panel" role="dialog" aria-label="Notifications" aria-modal="true">
+  <div class="notif-panel-header">
+    <span data-i18n="notif.title">🔔 Notifications</span>
+    <button onclick="document.getElementById('notif-panel').classList.remove('open')" aria-label="Close notifications">✕</button>
+  </div>
+  <div id="notif-list">
+    <div class="notif-empty" data-i18n="notif.empty">No notifications yet</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     SIDE PANEL (Community Reports Feed)
+══════════════════════════════════════════════════════════════ -->
+<aside class="side-panel" id="side-panel" role="complementary" aria-label="Community reports panel">
+  <button class="side-panel-toggle" id="panel-toggle" title="Toggle panel" aria-label="Toggle reports panel">›</button>
+
+  <!-- Tabs -->
+  <div class="panel-tabs" role="tablist">
+    <button class="panel-tab active" data-tab="feed" role="tab" aria-selected="true" id="tab-btn-feed">📋 Reports</button>
+    <button class="panel-tab" data-tab="gallery" role="tab" aria-selected="false" id="tab-btn-gallery">✅ Resolved</button>
+    <button class="panel-tab" data-tab="about" role="tab" aria-selected="false" id="tab-btn-about">ℹ️ About</button>
+  </div>
+
+  <!-- Feed Tab -->
+  <div class="panel-content" id="tab-feed" role="tabpanel" aria-labelledby="tab-btn-feed">
+    <div class="feed-header">
+      <span class="feed-title">Community Reports</span>
+      <span class="feed-count" id="feed-count">0</span>
+    </div>
+    <div class="feed-filters" role="group" aria-label="Filter reports">
+      <button class="filter-chip active" data-filter="all">All</button>
+      <button class="filter-chip" data-filter="pending">🔴 Pending</button>
+      <button class="filter-chip" data-filter="scheduled">🟡 Scheduled</button>
+      <button class="filter-chip" data-filter="in-progress">🔵 Active</button>
+      <button class="filter-chip" data-filter="resolved">🟢 Resolved</button>
+    </div>
+    <div id="feed-list" aria-live="polite">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- Gallery Tab -->
+  <div class="panel-content hidden" id="tab-gallery" role="tabpanel" aria-labelledby="tab-btn-gallery">
+    <div class="feed-header">
+      <span class="feed-title">Resolved Gallery</span>
+    </div>
+    <div class="gallery-grid" id="gallery-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- About Tab -->
+  <div class="panel-content hidden" id="tab-about" role="tabpanel" aria-labelledby="tab-btn-about">
+    <div style="padding:4px">
+      <div style="text-align:center;margin:12px 0">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/60px-Emblem_of_India.svg.png"
+          alt="Government of India Emblem" style="height:48px;width:auto" onerror="this.style.display='none'" />
+      </div>
+
+      <h2 style="font-size:14px;font-weight:800;text-align:center;margin-bottom:4px;color:var(--gov-blue-deep)">
+        MCL Pothole Grievance Portal
+      </h2>
+      <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:14px;font-style:italic">
+        नगर निगम लखनऊ — सड़क शिकायत पोर्टल
+      </p>
+      <p style="font-size:12.5px;color:var(--text-secondary);line-height:1.7;margin-bottom:14px">
+        Official portal for reporting and tracking pothole repair grievances in Lucknow under
+        the Municipal Corporation of Lucknow (MCL), Government of Uttar Pradesh.
+      </p>
+
+      <div style="background:#f8fbff;border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--gov-blue-deep);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;border-bottom:1px solid var(--gov-blue-pale);padding-bottom:6px">How to File a Complaint</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:2">
+          1️⃣ Click <strong style="color:var(--gov-blue)">Report a Pothole</strong> in the navigation<br>
+          2️⃣ Login with Mobile OTP or continue as Guest<br>
+          3️⃣ Pin location on map or use GPS<br>
+          4️⃣ Upload photo &amp; select severity<br>
+          5️⃣ Submit — receive your Complaint Ticket ID<br>
+          6️⃣ Track status updates via Track Report
+        </div>
+      </div>
+
+      <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:var(--radius-md);padding:14px;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:#e65100;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Grievance Officer</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+        <strong>Sh. Anil Kumar Verma</strong>, Executive Engineer (Roads)<br>
+          📞 0522-2630-1234<br>
+          📧 rti-mcl-roads@lucknow.gov.in<br>
+          🕐 Mon–Sat, 10:00 AM – 5:00 PM
+        </div>
+      </div>
+
+      <div style="background:#e8f8ee;border:1px solid #a5d6a7;border-radius:var(--radius-md);padding:12px;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:#1b5e20;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">SLA Commitments</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+          🔴 Critical pothole: <strong>48 hours</strong><br>
+          🟠 High severity: <strong>7 working days</strong><br>
+          🟡 Medium severity: <strong>15 working days</strong><br>
+          🟢 Low severity: <strong>30 working days</strong>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:var(--text-muted);text-align:center;line-height:1.6;padding-top:10px;border-top:1px solid var(--gov-blue-pale)">
+        Content owned &amp; maintained by <strong>MCL, Govt. of Uttar Pradesh</strong><br>
+        Designed &amp; hosted by <strong>NIC UP State Centre</strong><br>
+        <a href="#" style="color:var(--text-link)">Terms of Use</a> |
+        <a href="#" style="color:var(--text-link)">Privacy Policy</a> |
+        <a href="#" style="color:var(--text-link)">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CITIZEN LOGIN MODAL
+══════════════════════════════════════════════════════════════ -->
+<div class="login-modal-overlay" id="login-modal" role="dialog" aria-modal="true" aria-label="Citizen Login">
+  <div class="login-modal-card" style="position:relative">
+    <button class="login-close-btn" onclick="closeLoginModal()" aria-label="Close login">✕</button>
+
+    <div class="login-modal-header">
+      <div class="login-modal-emblem" aria-hidden="true"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/60px-Emblem_of_India.svg.png" alt="Emblem" style="height:50px;width:auto;display:block;margin:0 auto 10px"></div>
+      <div class="login-modal-title">Citizen Login</div>
+      <div class="login-modal-subtitle">Municipal Corporation of Lucknow — Grievance Portal</div>
+    </div>
+
+    <div class="login-modal-body">
+      <!-- Login method tabs -->
+      <div class="login-tabs" role="tablist">
+        <button class="login-tab active" data-login-tab="mobile" role="tab" aria-selected="true" onclick="switchLoginTab('mobile')">📱 Mobile OTP</button>
+        <button class="login-tab" data-login-tab="aadhaar" role="tab" aria-selected="false" onclick="switchLoginTab('aadhaar')">🪪 Aadhaar</button>
+        <button class="login-tab" data-login-tab="guest" role="tab" aria-selected="false" onclick="switchLoginTab('guest')">👤 Guest</button>
+      </div>
+
+      <!-- Mobile OTP Tab -->
+      <div class="login-tab-content active" id="login-tab-mobile">
+        <div class="login-form-group">
+          <label class="login-form-label" for="mobile-number">Mobile Number <span style="color:var(--pending)">*</span></label>
+          <input class="login-form-input" id="mobile-number" type="tel" maxlength="10"
+            placeholder="Enter 10-digit mobile number" inputmode="numeric" autocomplete="tel" />
+        </div>
+        <button class="btn-send-otp" id="btn-send-otp" onclick="sendOTP()">📲 Send OTP</button>
+
+        <div id="otp-section" style="display:none;margin-top:14px">
+          <div class="login-form-group" style="margin-bottom:8px">
+            <label class="login-form-label" for="otp-input">Enter OTP <span style="color:var(--pending)">*</span></label>
+            <div class="otp-row">
+              <input class="login-form-input" id="otp-input" type="text" maxlength="6"
+                placeholder="6-digit OTP" inputmode="numeric" autocomplete="one-time-code" />
+              <button class="btn-verify-otp" onclick="verifyOTP()">✅ Verify</button>
+            </div>
+          </div>
+          <p style="font-size:11px;color:var(--text-muted)">OTP sent to your mobile. Valid for 10 minutes. <a href="#" onclick="sendOTP();return false;" style="color:var(--text-link)">Resend OTP</a></p>
+        </div>
+      </div>
+
+      <!-- Aadhaar Tab -->
+      <div class="login-tab-content" id="login-tab-aadhaar">
+        <div class="aadhaar-info">
+          <span class="aadhaar-logo" aria-hidden="true">🪪</span>
+          <strong>Aadhaar-based Authentication</strong> (via UIDAI)<br>
+          Login with your 12-digit Aadhaar number and receive OTP on your registered mobile.
+          Your Aadhaar data is never stored on this portal.
+        </div>
+        <div class="login-form-group" style="margin-top:14px">
+          <label class="login-form-label" for="aadhaar-number">Aadhaar Number</label>
+          <input class="login-form-input" id="aadhaar-number" type="text" maxlength="14"
+            placeholder="XXXX XXXX XXXX" inputmode="numeric" />
+        </div>
+        <button class="btn-send-otp" onclick="sendAadhaarOTP()">🔐 Authenticate via UIDAI</button>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:8px">
+          Authentication powered by UIDAI. This portal uses standard Aadhaar OTP authentication.
+        </p>
+      </div>
+
+      <!-- Guest Tab -->
+      <div class="login-tab-content" id="login-tab-guest">
+        <div style="text-align:center;padding:12px 0 16px">
+          <div style="font-size:32px;margin-bottom:8px">👤</div>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px">
+            Continue without logging in. You can report potholes anonymously,
+            but you won't be able to track your specific reports later.
+          </p>
+          <button class="btn-guest" onclick="loginAsGuest()">Continue as Guest</button>
+        </div>
+        <p style="font-size:11.5px;color:var(--gov-blue);text-align:center">
+          <strong>Tip:</strong> Login with Mobile OTP to track your reports and receive status updates.
+        </p>
+      </div>
+
+      <div class="login-disclaimer">
+        By logging in, you agree to our
+        <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>.<br>
+        This portal is for Lucknow residents. For other jurisdictions, contact your local municipal authority.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     REPORT DRAWER
+══════════════════════════════════════════════════════════════ -->
+<div class="drawer-overlay" id="drawer-overlay" role="presentation"></div>
+<div class="drawer" id="report-drawer" role="dialog" aria-modal="true" aria-label="Report a Pothole — MCL Grievance Form">
+  <div class="drawer-handle" aria-hidden="true"></div>
+  <div class="drawer-header">
+    <div class="drawer-title">
+      <div class="drawer-title-icon" aria-hidden="true">📍</div>
+      Report a Pothole — Complaint Form
+    </div>
+    <button class="drawer-close" id="drawer-close" aria-label="Close form">✕</button>
+  </div>
+
+  <div class="drawer-body">
+    <!-- Breadcrumb inside drawer -->
+    <div class="drawer-breadcrumb" aria-label="Breadcrumb">
+      <a href="#">Home</a> <span class="bc-sep">›</span>
+      <a href="#">Services</a> <span class="bc-sep">›</span>
+      <strong>Report a Pothole</strong>
+    </div>
+
+    <!-- Logged-in user info bar (shown when logged in) -->
+    <div id="logged-in-bar" style="display:none;background:var(--gov-blue-pale);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:14px;font-size:12.5px;color:var(--gov-blue-deep);display:flex;align-items:center;gap:8px">
+      <span>👤</span>
+      <span id="logged-in-user-text">Logged in</span>
+      <a href="#" style="margin-left:auto;font-size:11.5px;color:var(--text-link)" onclick="logoutCitizen();return false;">Logout</a>
+    </div>
+
+    <form id="report-form" novalidate>
+
+      <!-- Location -->
+      <div class="form-group">
+        <div class="form-label">📍 Location <span class="required">*</span></div>
+        <div class="location-row">
+          <div class="location-display" id="location-display">Not set — use GPS or tap map below</div>
+          <button type="button" class="btn-location" id="btn-gps">📡 Use GPS</button>
+        </div>
+        <div class="location-hint">💡 Or tap/click anywhere on the map to drop a pin</div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label" for="report-desc">📝 Description of Complaint <span class="required">*</span></label>
+        <textarea class="form-textarea" id="report-desc" name="desc"
+          placeholder="Describe the pothole — approximate size (diameter/depth), exact location details, hazard to vehicles or pedestrians…"
+          rows="3" required></textarea>
+      </div>
+
+      <!-- Severity -->
+      <div class="form-group">
+        <div class="form-label">⚠️ Severity Level <span class="required">*</span></div>
+        <div class="severity-grid">
+          <button type="button" class="severity-option" data-sev="low" aria-label="Low severity">
+            <span class="severity-option-icon">🟢</span>
+            <span class="severity-option-label">Low</span>
+          </button>
+          <button type="button" class="severity-option selected" data-sev="medium" aria-label="Medium severity">
+            <span class="severity-option-icon">🟡</span>
+            <span class="severity-option-label">Medium</span>
+          </button>
+          <button type="button" class="severity-option" data-sev="high" aria-label="High severity">
+            <span class="severity-option-icon">🟠</span>
+            <span class="severity-option-label">High</span>
+          </button>
+          <button type="button" class="severity-option" data-sev="critical" aria-label="Critical severity">
+            <span class="severity-option-icon">🔴</span>
+            <span class="severity-option-label">Critical</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Road Type -->
+      <div class="form-group">
+        <label class="form-label" for="road-type">🛣️ Road Type</label>
+        <select class="form-select" id="road-type" name="roadType">
+          <option value="city-road">🏙️ City Road / Main Road</option>
+          <option value="highway">🛣️ Highway / NH</option>
+          <option value="lane">🚗 Lane / Internal Street</option>
+          <option value="bridge">🌉 Flyover / Bridge</option>
+        </select>
+      </div>
+
+      <!-- Address & Zone -->
+      <div class="reporter-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" for="report-address">📌 Nearest Landmark / Street</label>
+          <input class="form-input" id="report-address" type="text" placeholder="e.g., Near Karol Bagh Metro" />
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" for="report-zone">🗺️ Zone / District</label>
+          <select class="form-select" id="report-zone">
+            <option value="Aliganj">Aliganj</option>
+            <option value="Gomti Nagar">Gomti Nagar</option>
+            <option value="Hazratganj">Hazratganj</option>
+            <option value="Alambagh">Alambagh</option>
+            <option value="Chinhat">Chinhat</option>
+            <option value="Mahanagar">Mahanagar</option>
+            <option value="Indira Nagar">Indira Nagar</option>
+            <option value="Rajajipuram">Rajajipuram</option>
+            <option value="Chowk">Chowk</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Photo Upload (Before Photo) -->
+      <div class="form-group" style="margin-top:18px">
+        <div class="form-label">📷 Photograph of Pothole (Recommended)</div>
+        <div class="photo-source-row">
+          <button type="button" class="btn-camera-live" id="btn-open-camera">📸 Use Live Camera</button>
+          <span class="photo-source-or">or</span>
+          <div class="photo-upload-area photo-upload-area--compact" id="photo-upload-area" role="button" tabindex="0"
+            aria-label="Click to upload photograph">
+            <div class="photo-upload-text">📁 Upload from device</div>
+          </div>
+        </div>
+        <div class="photo-upload-hint" style="margin-top:6px">JPG, PNG, WEBP — max 5MB. A live photo helps prove the pothole is current.</div>
+        <div class="photo-preview" id="photo-preview" style="display:none">
+          <img src="" alt="Uploaded pothole photograph" />
+          <button class="photo-remove-btn" id="photo-remove" type="button" aria-label="Remove photograph">✕</button>
+        </div>
+        <div class="ai-check-box" id="ai-check-box" style="display:none"></div>
+        <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" aria-label="Upload photo file" />
+      </div>
+
+      <!-- Reporter Details -->
+      <div class="reporter-row" style="margin-top:4px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" for="reporter-name">👤 Name</label>
+          <input class="form-input" id="reporter-name" type="text" placeholder="Anonymous" autocomplete="name" />
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" for="reporter-mobile">📱 Mobile</label>
+          <input class="form-input" id="reporter-mobile" type="tel" placeholder="Optional, for updates"
+            inputmode="numeric" maxlength="10" />
+        </div>
+      </div>
+
+      <!-- CAPTCHA -->
+      <div class="form-group" style="margin-top:16px">
+        <div class="captcha-box" role="group" aria-label="CAPTCHA verification">
+          <input type="checkbox" class="captcha-checkbox" id="captcha-check" aria-label="I am not a robot" />
+          <span class="captcha-label">I am not a robot</span>
+          <div class="captcha-logo">🔒<br>reCAPTCHA</div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit" id="submit-btn">
+        <div class="spinner" aria-hidden="true"></div>
+        <span class="btn-submit-text">📤 Submit Complaint</span>
+      </button>
+
+      <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px;line-height:1.5">
+        By submitting this form, you confirm the information is accurate.<br>
+        False reporting may attract penalties under applicable laws.
+      </p>
+
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     DUPLICATE DETECTION MODAL
+══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="dup-modal" role="dialog" aria-modal="true" aria-label="Similar complaint already exists">
+  <div class="modal">
+    <div class="modal-icon">🔍</div>
+    <div class="modal-title">Similar Complaint Detected</div>
+    <div class="modal-desc">
+      A similar complaint already exists within 60 metres of your location.<br>
+      Upvoting the existing complaint helps MCL prioritize repair faster.
+    </div>
+    <div class="modal-report-preview">
+      <div class="ticket" id="dup-ticket"></div>
+      <div class="addr" id="dup-addr"></div>
+      <div class="votes" id="dup-votes"></div>
+      <div class="distance" id="dup-distance"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-modal-secondary" id="dup-cancel">✕ Cancel</button>
+      <button class="btn-modal btn-modal-secondary" id="dup-submit-anyway">+ New Complaint</button>
+      <button class="btn-modal btn-modal-primary" id="dup-upvote-btn">👍 Upvote Existing</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TICKET SUCCESS MODAL
+══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="ticket-modal" role="dialog" aria-modal="true" aria-label="Complaint submitted successfully">
+  <div class="modal ticket-modal-body">
+    <div class="ticket-confetti" aria-hidden="true">✅</div>
+    <div class="modal-title">Complaint Submitted Successfully!</div>
+    <div class="modal-desc">
+      Your pothole complaint has been registered with the Municipal Corporation of Lucknow.
+      Track its progress via the <strong>Track Report</strong> option.
+    </div>
+    <div class="ticket-id-display" id="success-ticket-id">POT-0000</div>
+    <p style="font-size:11.5px;color:var(--text-muted);margin-bottom:20px">
+      📋 Save this Complaint Ticket Number for future reference and tracking.
+    </p>
+    <button class="btn-modal btn-modal-primary" id="ticket-modal-close" style="width:100%">✅ Done</button>
+  </div>
+</div>
+
+<!-- ── Toast Container ──────────────────────────────────────────── -->
+<div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ── Scripts ────────────────────────────────────────────────── -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<!-- Optional shared database (see js/firebase-config.js). No-ops if unconfigured. -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/cloud-sync.js"></script>
+<script src="js/security.js"></script>
+<script src="js/error-tracker.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/duplicate.js"></script>
+<script src="js/offline.js"></script>
+<script src="js/escalation.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/ai-verify.js"></script>
+<script src="js/app.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/dashboard.js"></script>
+
+<script>
+  /* ── Government Portal UI Logic ────────────────────────────── */
+
+  // Citizen session (persisted in localStorage)
+  let citizenSession = null;
+  try {
+    const saved = localStorage.getItem('mcl_citizen_session');
+    if (saved) citizenSession = JSON.parse(saved);
+  } catch(e) {}
+
+  function updateLoginUI() {
+    const loginBtn = document.getElementById('header-login-btn');
+    const bar = document.getElementById('logged-in-bar');
+    const txt = document.getElementById('logged-in-user-text');
+    if (citizenSession) {
+      loginBtn.textContent = '👤 ' + (citizenSession.name || citizenSession.mobile || 'Citizen');
+      bar.style.display = 'flex';
+      if(txt) txt.textContent = 'Logged in as ' + (citizenSession.name || citizenSession.mobile || 'Citizen');
+    } else {
+      loginBtn.innerHTML = '👤 Citizen Login';
+      bar.style.display = 'none';
+    }
+  }
+
+  function openLoginModal() {
+    document.getElementById('login-modal').classList.add('open');
+  }
+  function closeLoginModal() {
+    document.getElementById('login-modal').classList.remove('open');
+  }
+
+  function switchLoginTab(tab) {
+    document.querySelectorAll('.login-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.loginTab === tab);
+      t.setAttribute('aria-selected', t.dataset.loginTab === tab);
+    });
+    document.querySelectorAll('.login-tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('login-tab-' + tab)?.classList.add('active');
+  }
+
+  let otpSent = false;
+  let demoOTP = '';
+
+  function sendOTP() {
+    const mobile = document.getElementById('mobile-number').value.trim();
+    if (!/^\d{10}$/.test(mobile)) {
+      alert('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    demoOTP = String(Math.floor(100000 + Math.random() * 900000));
+    otpSent = true;
+    document.getElementById('otp-section').style.display = 'block';
+    document.getElementById('btn-send-otp').textContent = '📲 OTP Sent!';
+    document.getElementById('btn-send-otp').disabled = true;
+    // Demo: show OTP in toast
+    Toast.show('Demo OTP: ' + demoOTP + ' (valid for 10 min)', 'info', 8000);
+  }
+
+  function verifyOTP() {
+    const entered = document.getElementById('otp-input').value.trim();
+    if (!otpSent) { alert('Please request OTP first.'); return; }
+    if (entered !== demoOTP) {
+      Toast.show('Incorrect OTP. Please try again.', 'error'); return;
+    }
+    const mobile = document.getElementById('mobile-number').value.trim();
+    citizenSession = { type: 'mobile', mobile, name: 'Citizen ' + mobile.slice(-4) };
+    localStorage.setItem('mcl_citizen_session', JSON.stringify(citizenSession));
+    closeLoginModal();
+    updateLoginUI();
+    Toast.show('✅ Logged in successfully!', 'success');
+  }
+
+  function sendAadhaarOTP() {
+    const num = document.getElementById('aadhaar-number').value.replace(/\s/g,'');
+    if (!/^\d{12}$/.test(num)) { alert('Please enter a valid 12-digit Aadhaar number.'); return; }
+    Toast.show('Aadhaar OTP sent to registered mobile (Demo Mode)', 'info', 5000);
+    // In demo: auto-login
+    setTimeout(() => {
+      citizenSession = { type: 'aadhaar', name: 'Aadhaar User' };
+      localStorage.setItem('mcl_citizen_session', JSON.stringify(citizenSession));
+      closeLoginModal();
+      updateLoginUI();
+      Toast.show('✅ Aadhaar authentication successful!', 'success');
+    }, 2000);
+  }
+
+  function loginAsGuest() {
+    citizenSession = { type: 'guest', name: 'Guest' };
+    localStorage.setItem('mcl_citizen_session', JSON.stringify(citizenSession));
+    closeLoginModal();
+    updateLoginUI();
+    openReportDrawer();
+  }
+
+  function logoutCitizen() {
+    citizenSession = null;
+    localStorage.removeItem('mcl_citizen_session');
+    updateLoginUI();
+    Toast.show('Logged out successfully.', 'info');
+  }
+
+  function openReportDrawer() {
+    if (typeof App !== 'undefined' && App.openDrawer) {
+      App.openDrawer();
+    } else {
+      document.getElementById('report-drawer').classList.add('open');
+      document.getElementById('drawer-overlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // Nav report button — check login first
+  let pendingReportMode = 'full';
+  document.getElementById('nav-report-btn')?.addEventListener('click', () => {
+    pendingReportMode = 'full';
+    if (!citizenSession) {
+      openLoginModal();
+    } else {
+      openReportDrawer();
+    }
+  });
+
+  // Quick Report — photo + live GPS only, no form
+  document.getElementById('nav-quick-report-btn')?.addEventListener('click', () => {
+    pendingReportMode = 'quick';
+    if (!citizenSession) {
+      openLoginModal();
+    } else if (typeof App !== 'undefined' && App.quickReport) {
+      App.quickReport();
+    }
+  });
+
+  // Header login button
+  document.getElementById('header-login-btn')?.addEventListener('click', () => {
+    if (citizenSession) {
+      // Already logged in — toggle a small dropdown or logout
+      if (confirm('You are logged in as ' + (citizenSession.name || citizenSession.mobile) + '. Logout?')) {
+        logoutCitizen();
+      }
+    } else {
+      openLoginModal();
+    }
+  });
+
+  // After OTP login, continue to whichever flow the citizen originally tapped
+  function continueAfterLogin() {
+    document.getElementById('logged-in-bar').style.display = 'flex';
+    if (pendingReportMode === 'quick' && typeof App !== 'undefined' && App.quickReport) {
+      App.quickReport();
+    } else {
+      openReportDrawer();
+    }
+  }
+
+  // Map search
+  document.getElementById('map-search-btn')?.addEventListener('click', () => {
+    const q = document.getElementById('map-search-input').value.trim().toLowerCase();
+    if (!q) return;
+    const reports = Storage.getAllReports();
+    const match = reports.find(r =>
+      r.id.toLowerCase().includes(q) ||
+      r.address.toLowerCase().includes(q) ||
+      r.zone?.toLowerCase().includes(q)
+    );
+    if (match && App.markers[match.id]) {
+      App.map.setView([match.lat, match.lng], 16, { animate: true, duration: 0.6 });
+      setTimeout(() => App.markers[match.id].openPopup(), 700);
+    } else {
+      Toast.show('No matching complaint found', 'warning', 2500);
+    }
+  });
+
+  document.getElementById('map-search-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('map-search-btn').click();
+  });
+
+  // Notification bell
+  document.getElementById('notif-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('notif-panel').classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    const panel = document.getElementById('notif-panel');
+    if (panel?.classList.contains('open') &&
+        !panel.contains(e.target) &&
+        e.target !== document.getElementById('notif-btn')) {
+      panel.classList.remove('open');
+    }
+    const loginModal = document.getElementById('login-modal');
+    if (loginModal?.classList.contains('open') && e.target === loginModal) {
+      closeLoginModal();
+    }
+  });
+
+  // Utility bar functions
+  function setFontSize(size) {
+    document.body.classList.remove('font-small','font-normal','font-large');
+    document.body.classList.add('font-' + size);
+    localStorage.setItem('mcl_fontsize', size);
+  }
+
+  function toggleHighContrast() {
+    document.body.classList.toggle('high-contrast');
+    localStorage.setItem('mcl_hc', document.body.classList.contains('high-contrast') ? '1' : '0');
+  }
+
+  // ── Language Switch (Full i18n) ──────────────────────────────
+  function setLang(lang) {
+    I18n.setLang(lang);
+    const meta = I18n.langMeta[lang];
+    const msg = meta ? `✅ Language changed to ${meta.native}` : '✅ Language changed';
+    Toast.show(msg, 'success', 2500);
+  }
+
+  // ── Premium Language Dropdown ───────────────────────────────
+  function toggleLangDropdown() {
+    const switcher = document.getElementById('lang-switcher');
+    if (switcher) switcher.classList.toggle('open');
+  }
+
+  function selectLang(lang) {
+    // Update active state in dropdown
+    document.querySelectorAll('.lang-dropdown-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.lang === lang);
+    });
+
+    // Update button label
+    const meta = I18n.langMeta[lang];
+    const nameEl = document.getElementById('lang-current-name');
+    if (nameEl && meta) nameEl.textContent = meta.native;
+
+    // Close dropdown
+    const switcher = document.getElementById('lang-switcher');
+    if (switcher) switcher.classList.remove('open');
+
+    // Apply language
+    setLang(lang);
+  }
+
+  // Close language dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    const switcher = document.getElementById('lang-switcher');
+    if (switcher && !switcher.contains(e.target)) {
+      switcher.classList.remove('open');
+    }
+  });
+
+  // Close language dropdown on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const switcher = document.getElementById('lang-switcher');
+      if (switcher) switcher.classList.remove('open');
+    }
+  });
+
+  // ── Full-Page Navigation System ──────────────────────────────
+  const allPageIds = ['services-section', 'about-page', 'track-page', 'rti-page', 'downloads-page', 'contact-page'];
+
+  function closeAllPages() {
+    document.getElementById('services-section').classList.remove('active');
+    document.querySelectorAll('.fullpage-section').forEach(s => s.classList.remove('active'));
+    // Unlock body scroll
+    document.body.style.overflow = '';
+    // Restore home active state
+    document.querySelectorAll('.gov-nav-list a').forEach(a => a.classList.remove('active'));
+    document.getElementById('nav-home').classList.add('active');
+  }
+
+  function openPage(pageId, navId) {
+    // Close everything first
+    document.getElementById('services-section').classList.remove('active');
+    document.querySelectorAll('.fullpage-section').forEach(s => s.classList.remove('active'));
+
+    // Open target after a micro-delay so close transition starts first
+    requestAnimationFrame(() => {
+      const target = document.getElementById(pageId);
+      if (target) {
+        target.classList.add('active');
+        target.scrollTop = 0;
+      }
+      // Lock body scroll while full page is open
+      document.body.style.overflow = 'hidden';
+      // Update nav active state
+      document.querySelectorAll('.gov-nav-list a').forEach(a => a.classList.remove('active'));
+      if (navId) document.getElementById(navId)?.classList.add('active');
+    });
+  }
+
+  // ── Services Page Toggle ────────────────────────────────────
+  function openServices() {
+    openPage('services-section', 'nav-services');
+  }
+
+  function closeServices() {
+    closeAllPages();
+  }
+
+  // ── About Page ──────────────────────────────────────────────
+  function openAbout() {
+    openPage('about-page', 'nav-about');
+  }
+
+  // ── Track Page ──────────────────────────────────────────────
+  function openTrack() {
+    openPage('track-page', 'nav-track');
+    populateTrackTable();
+  }
+
+  // ── RTI Page ────────────────────────────────────────────────
+  function openRTI() {
+    openPage('rti-page', 'nav-rti');
+  }
+
+  // ── Downloads Page ──────────────────────────────────────────
+  function openDownloads() {
+    openPage('downloads-page', 'nav-downloads');
+  }
+
+  // ── Contact Page ────────────────────────────────────────────
+  function openContact() {
+    openPage('contact-page', 'nav-contact');
+  }
+
+  // ── Track Search ────────────────────────────────────────────
+  let lastTrackedReport = null;
+
+  function searchTicket() {
+    const id = document.getElementById('track-ticket-input').value.trim();
+    if (!id) {
+      Toast.show('Please enter a Ticket ID.', 'warning', 2500);
+      return;
+    }
+    const reports = Storage.getAllReports();
+    const r = reports.find(rr => rr.id.toLowerCase() === id.toLowerCase());
+    if (!r) {
+      Toast.show('Ticket ID not found. Please check and try again.', 'error', 4000);
+      document.getElementById('track-result').style.display = 'none';
+      return;
+    }
+
+    lastTrackedReport = r;
+
+    // Populate result
+    document.getElementById('track-result-ticket').textContent = r.id;
+    const statusEl = document.getElementById('track-result-status');
+    statusEl.textContent = r.status.charAt(0).toUpperCase() + r.status.slice(1).replace('-', ' ');
+    statusEl.className = 'track-result-status status-' + r.status;
+    document.getElementById('track-result-location').textContent = r.address || `${r.lat.toFixed(4)}, ${r.lng.toFixed(4)}`;
+    document.getElementById('track-result-date').textContent = new Date(r.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('track-result-severity').textContent = (r.severity || 'medium').toUpperCase();
+    document.getElementById('track-result-zone').textContent = r.zone || 'Not specified';
+    document.getElementById('track-result-reporter').textContent = r.reporter || 'Anonymous';
+    document.getElementById('track-result-votes').textContent = r.votes || 0;
+
+    // Build timeline
+    const timelineEl = document.getElementById('track-timeline-steps');
+    const steps = [
+      { icon: '📝', label: 'Complaint Filed', date: new Date(r.timestamp).toLocaleDateString('en-IN'), active: true },
+      { icon: '🔍', label: 'Under Review', date: r.status !== 'pending' ? 'Reviewed' : '—', active: ['scheduled','in-progress','resolved'].includes(r.status) },
+      { icon: '📅', label: 'Repair Scheduled', date: r.status === 'scheduled' || r.status === 'in-progress' || r.status === 'resolved' ? 'Scheduled' : '—', active: ['scheduled','in-progress','resolved'].includes(r.status) },
+      { icon: '🔧', label: 'Repair In Progress', date: r.status === 'in-progress' || r.status === 'resolved' ? 'In Progress' : '—', active: ['in-progress','resolved'].includes(r.status) },
+      { icon: '✅', label: 'Resolved', date: r.status === 'resolved' ? 'Completed' : '—', active: r.status === 'resolved' }
+    ];
+    timelineEl.innerHTML = steps.map(s => `
+      <div class="timeline-step ${s.active ? 'active' : ''}">
+        <div class="timeline-dot">${s.icon}</div>
+        <div class="timeline-info">
+          <div class="timeline-label">${s.label}</div>
+          <div class="timeline-date">${s.date}</div>
+        </div>
+      </div>
+    `).join('');
+
+    document.getElementById('track-result').style.display = 'block';
+    document.getElementById('track-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Enter key for track search
+  document.getElementById('track-ticket-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') searchTicket();
+  });
+
+  function viewOnMap() {
+    if (!lastTrackedReport) return;
+    closeAllPages();
+    const r = lastTrackedReport;
+    if (App.markers[r.id]) {
+      App.map.setView([r.lat, r.lng], 16, { animate: true });
+      setTimeout(() => App.markers[r.id].openPopup(), 700);
+    }
+  }
+
+  // Populate complaints table
+  function populateTrackTable() {
+    const tbody = document.getElementById('track-table-body');
+    if (!tbody) return;
+    const reports = Storage.getAllReports();
+    if (reports.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">No complaints found. Submit a report to see it here.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = reports.slice(0, 20).map(r => {
+      const sevColors = { low: '🟢', medium: '🟡', high: '🟠', critical: '🔴' };
+      const statusColors = { pending: '#c0392b', scheduled: '#e67e22', 'in-progress': '#2980b9', resolved: '#27ae60' };
+      const statusLabel = r.status.charAt(0).toUpperCase() + r.status.slice(1).replace('-', ' ');
+      return `<tr>
+        <td><strong>${r.id}</strong></td>
+        <td>${r.address || 'GPS Location'}</td>
+        <td>${sevColors[r.severity] || '🟡'} ${(r.severity || 'medium').toUpperCase()}</td>
+        <td><span style="background:${statusColors[r.status] || '#888'};color:#fff;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;">${statusLabel}</span></td>
+        <td>${new Date(r.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
+        <td><button class="track-table-action" onclick="document.getElementById('track-ticket-input').value='${r.id}';searchTicket();">View</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── Contact Form Submission ─────────────────────────────────
+  function submitContactForm() {
+    const name = document.getElementById('contact-name')?.value.trim();
+    const email = document.getElementById('contact-email')?.value.trim();
+    const msg = document.getElementById('contact-message')?.value.trim();
+    if (!name || !msg) {
+      Toast.show('Please fill in your name and message.', 'error', 3000);
+      return;
+    }
+    // Clear form
+    document.getElementById('contact-name').value = '';
+    document.getElementById('contact-email').value = '';
+    document.getElementById('contact-message').value = '';
+    Toast.show('✅ Thank you! Your message has been sent to MCL Roads Department.', 'success', 4000);
+  }
+
+  // ── Service Card Click Handler ──────────────────────────────
+  function handleServiceClick(type) {
+    // Direct links for existing features
+    if (type === 'pothole') {
+      closeAllPages();
+      if (!citizenSession) {
+        openLoginModal();
+      } else {
+        openReportDrawer();
+      }
+      return;
+    }
+    if (type === 'track') {
+      closeAllPages();
+      openTrack();
+      return;
+    }
+    if (type === 'helpline') {
+      openSOS();
+      return;
+    }
+    if (type === 'download') {
+      closeAllPages();
+      openDownloads();
+      return;
+    }
+    if (type === 'encroachment' || type === 'safety') {
+      Toast.show(I18n.t('services.comingSoon') + ' — This service is under development.', 'info', 3000);
+      return;
+    }
+    // Open service request modal for other types
+    openServiceModal(type);
+  }
+
+  // ── Service Request Modal ──────────────────────────────────
+  function openServiceModal(type) {
+    const modal = document.getElementById('service-modal');
+    const select = document.getElementById('svc-type');
+    if (select && type) {
+      select.value = type;
+    }
+    modal.classList.add('open');
+  }
+
+  function closeServiceModal() {
+    document.getElementById('service-modal').classList.remove('open');
+  }
+
+  let serviceTicketCounter = 100;
+  function submitServiceRequest() {
+    const type = document.getElementById('svc-type').value;
+    const location = document.getElementById('svc-location').value.trim();
+    const desc = document.getElementById('svc-description').value.trim();
+
+    if (!location || !desc) {
+      Toast.show('Please fill in all required fields.', 'error', 3000);
+      return;
+    }
+
+    serviceTicketCounter++;
+    const ticketId = `SVC-${String(serviceTicketCounter).padStart(4, '0')}`;
+    closeServiceModal();
+
+    // Clear form
+    document.getElementById('svc-location').value = '';
+    document.getElementById('svc-description').value = '';
+
+    Toast.show(`✅ Service request ${ticketId} submitted successfully! Type: ${type.toUpperCase()}`, 'success', 5000);
+  }
+
+  // ── SOS Emergency Modal ─────────────────────────────────────
+  function openSOS() {
+    document.getElementById('sos-modal').classList.add('open');
+    document.getElementById('sos-chat-input')?.focus();
+  }
+
+  function closeSOS() {
+    document.getElementById('sos-modal').classList.remove('open');
+  }
+
+  document.getElementById('sos-chat-form')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const input = document.getElementById('sos-chat-input');
+    const message = input.value.trim();
+    if (!message) return;
+    const chat = document.getElementById('sos-chat');
+    chat.insertAdjacentHTML('beforeend', `<div class="sos-chat-message user">${Security.sanitizeHTML(message)}</div>`);
+    input.value = '';
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, sessionId: App.userId || 'citizen-sos' })
+      });
+      const data = await response.json();
+      chat.insertAdjacentHTML('beforeend', `<div class="sos-chat-message assistant">${Security.sanitizeHTML(data.reply || 'Please call the emergency helpline.')}</div>`);
+    } catch {
+      chat.insertAdjacentHTML('beforeend', '<div class="sos-chat-message assistant">Please call MCL Control Room: 0522-2630-1234 or Toll-Free: 1800-180-5555.</div>');
+    }
+    chat.scrollTop = chat.scrollHeight;
+  });
+
+  // Close SOS on overlay click
+  document.getElementById('sos-modal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('sos-modal')) closeSOS();
+  });
+
+  // ── FAQ Accordion ───────────────────────────────────────────
+  function toggleFAQ(btn) {
+    const item = btn.closest('.faq-item');
+    const wasOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    // Toggle current
+    if (!wasOpen) item.classList.add('open');
+  }
+
+  // ── Feedback System ─────────────────────────────────────────
+  let selectedRating = null;
+  function selectRating(btn) {
+    document.querySelectorAll('.feedback-star-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedRating = btn.dataset.rating;
+  }
+
+  function submitFeedback() {
+    if (!selectedRating) {
+      Toast.show('Please select a rating before submitting.', 'warning', 2500);
+      return;
+    }
+    document.getElementById('feedback-submit-btn').style.display = 'none';
+    document.getElementById('feedback-stars').style.opacity = '0.5';
+    document.getElementById('feedback-stars').style.pointerEvents = 'none';
+    document.getElementById('feedback-thanks').style.display = 'block';
+    Toast.show(I18n.t('feedback.thanks'), 'success', 3000);
+    // Persist
+    localStorage.setItem('mcl_feedback', selectedRating);
+  }
+
+  // Check if already submitted feedback
+  if (localStorage.getItem('mcl_feedback')) {
+    const fb = document.getElementById('feedback-submit-btn');
+    const ft = document.getElementById('feedback-thanks');
+    if (fb) fb.style.display = 'none';
+    if (ft) ft.style.display = 'block';
+  }
+
+
+  // Close service modal on overlay click
+  document.getElementById('service-modal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('service-modal')) closeServiceModal();
+  });
+
+  // ── Quick Stats Animation ───────────────────────────────────
+  function animateCounter(el, target, duration = 1500) {
+    const start = 0;
+    const startTime = performance.now();
+    function step(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(start + (target - start) * eased);
+      el.textContent = current.toLocaleString('en-IN');
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // Animate stats when services section opens
+  const servicesObserver = new MutationObserver((mutations) => {
+    mutations.forEach(m => {
+      if (m.target.classList.contains('active')) {
+        animateCounter(document.getElementById('qs-total'), 2847);
+        animateCounter(document.getElementById('qs-resolved'), 2134);
+      }
+    });
+  });
+  const servicesEl = document.getElementById('services-section');
+  if (servicesEl) servicesObserver.observe(servicesEl, { attributes: true, attributeFilter: ['class'] });
+
+  // Restore preferences
+  const savedFont = localStorage.getItem('mcl_fontsize');
+  if (savedFont) setFontSize(savedFont);
+  if (localStorage.getItem('mcl_hc') === '1') document.body.classList.add('high-contrast');
+
+  // Init login UI
+  updateLoginUI();
+
+  // Init i18n
+  I18n.init();
+</script>
+
+</body>
+</html>

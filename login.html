@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Citizen Login — MCL Road Grievance Portal</title>
+  <meta name="description" content="Login to the Municipal Corporation of Lucknow Road Grievance Portal to report and track pothole complaints." />
+  <meta name="robots" content="noindex, follow" />
+
+  <script>
+    window.location.replace('index.html?login=citizen');
+  </script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gov-blue-deep:  #003366;
+      --gov-blue:       #004080;
+      --gov-blue-mid:   #1a5276;
+      --gov-blue-light: #2980b9;
+      --gov-blue-pale:  #d6e8f7;
+      --gov-blue-bg:    #eaf3fb;
+      --saffron:        #FF9933;
+      --gov-green:      #138808;
+      --border:         #c8d8e8;
+      --text-primary:   #1a1a2e;
+      --text-secondary: #495057;
+      --text-muted:     #6c757d;
+      --text-link:      #004080;
+      --shadow-md:      0 4px 16px rgba(0,51,102,0.12);
+      --shadow-lg:      0 8px 32px rgba(0,51,102,0.16);
+      --radius-sm:      4px;
+      --radius-md:      8px;
+      --radius-lg:      12px;
+      --transition:     all 0.2s ease;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Noto Sans', -apple-system, Arial, sans-serif;
+      background: #f0f4f8;
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Tricolor strip */
+    .tricolor-strip {
+      height: 5px;
+      background: linear-gradient(to right,
+        #FF9933 0%, #FF9933 33.33%,
+        #fff 33.33%, #fff 66.66%,
+        #138808 66.66%, #138808 100%
+      );
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    }
+
+    /* Utility bar */
+    .utility-bar {
+      position: fixed; top: 5px; left: 0; right: 0;
+      height: 32px; background: #1a3a5c; z-index: 999;
+      display: flex; align-items: center; padding: 0 20px; gap: 2px;
+      font-size: 11.5px; color: #c8daea;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .utility-bar a, .utility-bar button {
+      color: #c8daea; text-decoration: none; background: none;
+      border: none; cursor: pointer; font-size: 11.5px;
+      font-family: inherit; padding: 2px 8px; transition: var(--transition);
+    }
+    .utility-bar a:hover, .utility-bar button:hover { color: #fff; text-decoration: underline; }
+    .util-sep { color: rgba(255,255,255,0.3); margin: 0 2px; font-size: 10px; }
+
+    /* Header */
+    .gov-header {
+      position: fixed; top: 37px; left: 0; right: 0;
+      height: 76px; background: var(--gov-blue-deep); z-index: 998;
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    .header-emblem {
+      font-size: 40px; line-height: 1; color: #ffd700; flex-shrink: 0;
+    }
+    .header-divider { width: 2px; height: 52px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+    .header-text { flex: 1; }
+    .header-dept-hi { font-family: 'Noto Sans Devanagari', sans-serif; font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.3; }
+    .header-dept-en { font-size: 17px; font-weight: 700; color: #fff; line-height: 1.3; }
+    .header-ministry { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
+    /* Nav */
+    .gov-nav {
+      position: fixed; top: 113px; left: 0; right: 0;
+      height: 42px; background: #00264d; z-index: 997;
+      display: flex; align-items: center; padding: 0 16px; gap: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .gov-nav a {
+      display: flex; align-items: center; height: 42px;
+      padding: 0 14px; color: rgba(255,255,255,0.8);
+      text-decoration: none; font-size: 12.5px; font-weight: 500;
+      border-bottom: 3px solid transparent; transition: var(--transition);
+      white-space: nowrap;
+    }
+    .gov-nav a:hover { color: #fff; background: rgba(255,255,255,0.08); border-bottom-color: var(--saffron); }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      position: fixed; top: 155px; left: 0; right: 0;
+      height: 28px; background: #f0f4f8;
+      border-bottom: 1px solid var(--border);
+      z-index: 996; display: flex; align-items: center;
+      padding: 0 20px; gap: 6px; font-size: 11.5px; color: var(--text-muted);
+    }
+    .breadcrumb a { color: var(--text-link); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    /* Main content area */
+    .login-page-main {
+      padding-top: 185px; /* header + nav + breadcrumb */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f0f4f8;
+    }
+
+    .login-page-container {
+      width: 100%; max-width: 520px;
+      padding: 32px 20px 20px;
+    }
+
+    /* Login card */
+    .login-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      border: 1px solid var(--gov-blue-pale);
+    }
+
+    .login-card-header {
+      background: var(--gov-blue-deep);
+      padding: 24px;
+      text-align: center;
+      border-bottom: 4px solid var(--saffron);
+    }
+
+    .login-card-emblem { font-size: 44px; margin-bottom: 10px; display: block; color: #ffd700; }
+    .login-card-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .login-card-subtitle { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.5; }
+    .login-card-subtitle span { font-family: 'Noto Sans Devanagari', sans-serif; }
+
+    .login-card-body { padding: 28px; }
+
+    /* Method tabs */
+    .method-tabs {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 24px;
+    }
+    .method-tab {
+      padding: 11px 8px; text-align: center;
+      font-size: 12px; font-weight: 600;
+      background: #fff; border: none; cursor: pointer;
+      color: var(--text-muted); font-family: inherit;
+      transition: var(--transition);
+      border-right: 1.5px solid var(--border);
+    }
+    .method-tab:last-child { border-right: none; }
+    .method-tab:hover { background: var(--gov-blue-bg); color: var(--gov-blue); }
+    .method-tab.active { background: var(--gov-blue-deep); color: #fff; font-weight: 700; }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Form elements */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 13.5px; font-family: inherit; outline: none;
+      transition: var(--transition); background: #fff; color: var(--text-primary);
+    }
+    .form-input:focus { border-color: var(--gov-blue); box-shadow: 0 0 0 3px rgba(0,64,128,0.1); }
+    .form-input::placeholder { color: var(--text-muted); }
+
+    .mobile-prefix {
+      display: flex; gap: 0; align-items: stretch;
+    }
+    .prefix-badge {
+      background: var(--gov-blue-bg); border: 1.5px solid var(--border);
+      border-right: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+      padding: 0 12px; font-size: 13px; font-weight: 600; color: var(--gov-blue-mid);
+      display: flex; align-items: center; white-space: nowrap;
+    }
+    .mobile-prefix .form-input { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+    .btn-primary {
+      width: 100%; padding: 12px;
+      background: var(--gov-blue-deep); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      letter-spacing: 0.3px;
+    }
+    .btn-primary:hover { background: var(--gov-blue-mid); }
+    .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    .btn-secondary {
+      width: 100%; padding: 11px;
+      background: #f8fbff; color: var(--text-secondary);
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: inherit; transition: var(--transition);
+    }
+    .btn-secondary:hover { border-color: var(--gov-blue-light); color: var(--gov-blue); background: var(--gov-blue-bg); }
+
+    .btn-success {
+      padding: 10px 18px;
+      background: var(--gov-green); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: var(--transition);
+      white-space: nowrap;
+    }
+    .btn-success:hover { background: #0d6b06; }
+
+    .otp-row { display: flex; gap: 8px; align-items: flex-start; }
+    .otp-row .form-input { flex: 1; }
+
+    .alert-info {
+      background: #e8f4fd; border: 1px solid #90caf9;
+      border-radius: var(--radius-sm); padding: 11px 13px;
+      font-size: 12.5px; color: #0d47a1; line-height: 1.5; margin-bottom: 14px;
+    }
+    .alert-warning {
+      background: #fff8e1; border: 1px solid #ffe082;
+      border-radius: var(--radius-sm); padding: 11px 13px;
+      font-size: 12px; color: #e65100; line-height: 1.5; margin-bottom: 14px;
+    }
+    .alert-success {
+      background: #e8f5e9; border: 1px solid #a5d6a7;
+      border-radius: var(--radius-sm); padding: 11px 13px;
+      font-size: 12.5px; color: #1b5e20; line-height: 1.5; margin-bottom: 14px;
+    }
+
+    /* Guest section */
+    .guest-box {
+      text-align: center; padding: 12px 0 8px;
+    }
+    .guest-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+    .guest-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+    .guest-note { font-size: 12px; color: var(--gov-blue); background: var(--gov-blue-bg); border: 1px solid var(--gov-blue-pale); border-radius: var(--radius-sm); padding: 8px 12px; text-align: left; }
+
+    /* Divider */
+    .divider { text-align: center; font-size: 11.5px; color: var(--text-muted); margin: 16px 0; position: relative; }
+    .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 43%; height: 1px; background: var(--border); }
+    .divider::before { left: 0; } .divider::after { right: 0; }
+
+    /* Disclaimer */
+    .disclaimer {
+      font-size: 11px; color: var(--text-muted); text-align: center;
+      line-height: 1.6; margin-top: 20px; padding-top: 14px;
+      border-top: 1px solid var(--gov-blue-pale);
+    }
+    .disclaimer a { color: var(--text-link); text-decoration: none; }
+    .disclaimer a:hover { text-decoration: underline; }
+
+    /* CAPTCHA */
+    .captcha-box {
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 10px 14px; display: flex; align-items: center; gap: 12px;
+      background: #f8fbff; margin-top: 14px;
+    }
+    .captcha-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--gov-blue); }
+    .captcha-label { font-size: 13px; color: var(--text-secondary); flex: 1; }
+    .captcha-logo { font-size: 10px; color: var(--text-muted); text-align: right; line-height: 1.3; }
+
+    /* Badges row */
+    .portal-badges {
+      display: flex; justify-content: center; gap: 12px;
+      margin-top: 18px; flex-wrap: wrap;
+    }
+    .portal-badge {
+      padding: 4px 10px; border: 1px solid var(--border);
+      border-radius: 3px; font-size: 10.5px; color: var(--text-muted);
+      background: #fff;
+    }
+
+    /* Back link */
+    .back-link {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text-link); text-decoration: none;
+      margin-bottom: 20px; font-weight: 500;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    /* Footer */
+    .page-footer {
+      background: #002244; color: rgba(255,255,255,0.6);
+      font-size: 11.5px; text-align: center; padding: 14px 20px;
+      margin-top: auto; line-height: 1.7;
+    }
+    .page-footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    .page-footer a:hover { color: #fff; text-decoration: underline; }
+
+    /* Toast */
+    .toast-bar {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%); z-index: 9999;
+      background: var(--gov-blue-deep); color: #fff;
+      padding: 10px 22px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500;
+      box-shadow: var(--shadow-lg); display: none;
+      border-left: 4px solid var(--saffron);
+      white-space: nowrap;
+    }
+    .toast-bar.visible { display: block; }
+    .toast-bar.success { background: #1b5e20; border-left-color: #4caf50; }
+    .toast-bar.error   { background: #b71c1c; border-left-color: #ef5350; }
+
+    @media (max-width: 480px) {
+      .login-card-header { padding: 18px; }
+      .login-card-body   { padding: 20px 16px; }
+      .login-page-container { padding: 24px 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Tricolor Strip -->
+<div class="tricolor-strip" aria-hidden="true"></div>
+
+<!-- Utility Bar -->
+<div class="utility-bar" role="navigation" aria-label="Utility bar">
+  <a href="index.html">← Back to Portal</a>
+  <span class="util-sep">|</span>
+  <span>Screen Reader</span>
+  <span class="util-sep">|</span>
+  <span>Text Size: A- A A+</span>
+  <span class="util-sep">|</span>
+  <a href="#">High Contrast</a>
+</div>
+
+<!-- Government Header -->
+<header class="gov-header" role="banner">
+  <div class="header-emblem" aria-label="Government emblem" aria-hidden="true">🏛️</div>
+  <div class="header-divider" aria-hidden="true"></div>
+  <div class="header-text">
+    <div class="header-dept-hi" lang="hi">नगर निगम लखनऊ — नागरिक लॉगिन</div>
+    <div class="header-dept-en">Municipal Corporation of Lucknow</div>
+    <div class="header-ministry">Citizen Authentication Portal | Road Grievance System | Govt. of Uttar Pradesh</div>
+  </div>
+</header>
+
+<!-- Navigation -->
+<nav class="gov-nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html">🏠 Home</a>
+  <a href="#">ℹ️ About</a>
+  <a href="#">📋 Services</a>
+  <a href="index.html#report" style="background:rgba(255,153,51,0.2);border-bottom:3px solid #FF9933;color:#fff;font-weight:600">📍 Report a Pothole</a>
+  <a href="#">🔍 Track Report</a>
+  <a href="#">📄 RTI</a>
+  <a href="#">📞 Contact</a>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb" aria-label="Breadcrumb navigation">
+  <a href="index.html">Home</a>
+  <span style="color:#aab;font-size:10px">›</span>
+  <strong>Citizen Login</strong>
+</div>
+
+<!-- Main Login Content -->
+<main class="login-page-main" id="main-content">
+  <div class="login-page-container">
+
+    <a href="index.html" class="back-link" aria-label="Back to portal">← Back to Portal Home</a>
+
+    <div class="login-card">
+      <!-- Card Header -->
+      <div class="login-card-header">
+        <span class="login-card-emblem" aria-hidden="true">
+          <svg width="56" height="62" viewBox="0 0 70 76" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="35" cy="16" r="13" fill="none" stroke="#FFD700" stroke-width="1.8"/>
+            <circle cx="35" cy="16" r="4" fill="none" stroke="#FFD700" stroke-width="1.4"/>
+            <circle cx="35" cy="16" r="1.5" fill="#FFD700"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(15 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(30 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(45 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(60 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(75 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(90 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(105 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(120 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(135 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(150 35 16)"/>
+            <line x1="35" y1="3.5" x2="35" y2="28.5" stroke="#FFD700" stroke-width="0.7" transform="rotate(165 35 16)"/>
+            <ellipse cx="24" cy="33" rx="6" ry="4.5" fill="#C9A84C"/>
+            <circle cx="20" cy="29.5" r="4" fill="#C9A84C"/>
+            <ellipse cx="46" cy="33" rx="6" ry="4.5" fill="#C9A84C"/>
+            <circle cx="50" cy="29.5" r="4" fill="#C9A84C"/>
+            <ellipse cx="35" cy="33" rx="7" ry="5" fill="#D4A843"/>
+            <circle cx="35" cy="27.5" r="5" fill="#D4A843"/>
+            <ellipse cx="35" cy="27" rx="3.5" ry="3" fill="#C9984A"/>
+            <ellipse cx="35" cy="27.5" rx="5.5" ry="4.5" fill="none" stroke="#b8860b" stroke-width="1.2"/>
+            <rect x="19" y="37" width="32" height="7" rx="1.5" fill="#B8960C"/>
+            <rect x="31" y="44" width="8" height="22" rx="2" fill="#B8960C"/>
+            <rect x="23" y="66" width="24" height="5" rx="1.5" fill="#C9A84C"/>
+            <rect x="18" y="71" width="34" height="4" rx="1" fill="#8B6914" opacity="0.7"/>
+            <text x="35" y="74.5" text-anchor="middle" fill="#FFD700" font-size="3.5" font-family="serif" font-weight="700" letter-spacing="0.5">SATYAMEVA JAYATE</text>
+          </svg>
+        </span>
+        <h1 class="login-card-title">Citizen Login | नागरिक लॉगिन</h1>
+        <div class="login-card-subtitle">
+          Authenticate to report and track pothole complaints<br>
+          <span lang="hi">शिकायत दर्ज करने के लिए लॉगिन करें</span><br>
+          <span style="font-size:10.5px;color:rgba(255,255,255,0.5)">Municipal Corporation of Lucknow | नगर निगम लखनऊ</span>
+        </div>
+      </div>
+
+      <!-- Card Body -->
+      <div class="login-card-body">
+
+        <!-- Method Tabs -->
+        <div class="method-tabs" role="tablist" aria-label="Login methods">
+          <button class="method-tab active" onclick="switchTab('mobile')" role="tab" aria-selected="true" id="tab-mobile">📱 Mobile OTP</button>
+          <button class="method-tab" onclick="switchTab('aadhaar')" role="tab" aria-selected="false" id="tab-aadhaar">🪪 Aadhaar</button>
+          <button class="method-tab" onclick="switchTab('guest')" role="tab" aria-selected="false" id="tab-guest">👤 Guest</button>
+        </div>
+
+        <!-- Mobile OTP Pane -->
+        <div class="tab-pane active" id="pane-mobile" role="tabpanel">
+          <div class="alert-info">📲 Enter your mobile number to receive a One-Time Password (OTP) for secure login.</div>
+
+          <div class="form-group">
+            <label class="form-label" for="mobile-num">Mobile Number *</label>
+            <div class="mobile-prefix">
+              <span class="prefix-badge">🇮🇳 +91</span>
+              <input class="form-input" id="mobile-num" type="tel" maxlength="10"
+                placeholder="Enter 10-digit mobile number" inputmode="numeric" autocomplete="tel" />
+            </div>
+          </div>
+
+          <div class="captcha-box" id="captcha-1" role="group" aria-label="CAPTCHA">
+            <input type="checkbox" class="captcha-checkbox" id="cap1" />
+            <label for="cap1" class="captcha-label">I am not a robot</label>
+            <div class="captcha-logo">🔒<br>reCAPTCHA</div>
+          </div>
+
+          <div style="height:12px"></div>
+          <button class="btn-primary" id="btn-otp" onclick="sendOTP()">📲 Send OTP</button>
+
+          <div id="otp-pane" style="display:none;margin-top:18px">
+            <div class="alert-success" id="otp-sent-msg">OTP sent to your mobile number. Valid for 10 minutes.</div>
+            <div class="form-group">
+              <label class="form-label" for="otp-val">Enter OTP *</label>
+              <div class="otp-row">
+                <input class="form-input" id="otp-val" type="text" maxlength="6"
+                  placeholder="6-digit OTP" inputmode="numeric" autocomplete="one-time-code" />
+                <button class="btn-success" onclick="verifyOTP()">✅ Verify &amp; Login</button>
+              </div>
+            </div>
+            <p style="font-size:11.5px;color:var(--text-muted)">
+              Didn't receive OTP? <a href="#" onclick="sendOTP();return false;" style="color:var(--text-link)">Resend OTP</a>
+            </p>
+          </div>
+        </div>
+
+        <!-- Aadhaar Pane -->
+        <div class="tab-pane" id="pane-aadhaar" role="tabpanel">
+          <div class="alert-warning">
+            🪪 <strong>Aadhaar Authentication (Demo)</strong> — Powered by UIDAI. In production, this uses
+            official UIDAI OTP API. Your Aadhaar data is never stored on this portal.
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="aadhaar-num">Aadhaar Number (12 digits) *</label>
+            <input class="form-input" id="aadhaar-num" type="text" maxlength="14"
+              placeholder="XXXX XXXX XXXX" inputmode="numeric" />
+          </div>
+
+          <div class="captcha-box" role="group" aria-label="CAPTCHA">
+            <input type="checkbox" class="captcha-checkbox" id="cap2" />
+            <label for="cap2" class="captcha-label">I am not a robot</label>
+            <div class="captcha-logo">🔒<br>reCAPTCHA</div>
+          </div>
+
+          <div style="height:12px"></div>
+          <button class="btn-primary" onclick="sendAadhaarOTP()">🔐 Authenticate via UIDAI</button>
+
+          <div id="aadhaar-otp-pane" style="display:none;margin-top:16px">
+            <div class="alert-success">OTP sent to your Aadhaar-linked mobile. Enter below to verify.</div>
+            <div class="otp-row">
+              <input class="form-input" id="aadhaar-otp-val" type="text" maxlength="6" placeholder="6-digit OTP" />
+              <button class="btn-success" onclick="verifyAadhaarOTP()">✅ Verify</button>
+            </div>
+          </div>
+
+          <p style="font-size:11px;color:var(--text-muted);margin-top:12px;line-height:1.5">
+            Aadhaar authentication complies with UIDAI Security Guidelines and is protected
+            by 256-bit AES encryption. <a href="#" style="color:var(--text-link)">Privacy Policy</a>.
+          </p>
+        </div>
+
+        <!-- Guest Pane -->
+        <div class="tab-pane" id="pane-guest" role="tabpanel">
+          <div class="guest-box">
+            <span class="guest-icon" aria-hidden="true">👤</span>
+            <p class="guest-desc">
+              You can file a pothole complaint without logging in.
+              Guest submissions are anonymous and help us improve roads for everyone.
+            </p>
+            <button class="btn-primary" onclick="guestLogin()" style="margin-bottom:14px">Continue as Guest →</button>
+            <div class="guest-note">
+              ℹ️ <strong>Note:</strong> Guest users cannot track specific reports or receive SMS status updates.
+              Login with Mobile OTP for these features.
+            </div>
+          </div>
+        </div>
+
+        <div class="disclaimer">
+          By using this portal, you agree to our
+          <a href="#">Terms of Use</a>,
+          <a href="#">Privacy Policy</a>, and
+          <a href="#">Accessibility Statement</a>.<br>
+          This portal is governed under the <strong>Lucknow Municipal Corporation Act, 1959</strong> and
+          <strong>IT Act, 2000</strong>.
+          Misuse may attract legal action.
+        </div>
+      </div>
+    </div>
+
+    <!-- Compliance Badges -->
+    <div class="portal-badges" aria-label="Compliance certifications">
+      <span class="portal-badge">🛡️ GIGW Compliant</span>
+      <span class="portal-badge">♿ WCAG 2.0 Level A</span>
+      <span class="portal-badge">🔒 SSL Secured</span>
+      <span class="portal-badge">🇮🇳 NIC Hosted</span>
+    </div>
+
+  </div>
+
+  <!-- Page Footer -->
+  <footer class="page-footer" role="contentinfo">
+    Content owned &amp; maintained by <strong>Municipal Corporation of Lucknow (MCL)</strong>, Govt. of Uttar Pradesh.<br>
+    Website designed, developed &amp; hosted by <strong>NIC UP State Centre</strong>.<br>
+    <a href="#">Terms of Use</a> | <a href="#">Privacy Policy</a> | <a href="#">Accessibility</a> |
+    <a href="#">RTI</a> | <a href="#">Sitemap</a> | <a href="#">Contact Us</a><br>
+    <span style="font-size:10.5px;color:rgba(255,255,255,0.4)">Last Updated: July 2025 &nbsp;|&nbsp; Visitors: <span id="visitor-count">12,847</span></span>
+  </footer>
+</main>
+
+<!-- Toast -->
+<div class="toast-bar" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  function showToast(msg, type='info', dur=3500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast-bar visible ' + type;
+    setTimeout(() => t.classList.remove('visible'), dur);
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.method-tab').forEach(t => {
+      const active = t.id === 'tab-' + name;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', active);
+    });
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('pane-' + name)?.classList.add('active');
+  }
+
+  let demoOTP = '';
+  let otpSent = false;
+
+  function sendOTP() {
+    const mobile = document.getElementById('mobile-num').value.trim();
+    const cap = document.getElementById('cap1').checked;
+    if (!/^\d{10}$/.test(mobile)) { showToast('Please enter a valid 10-digit mobile number.', 'error'); return; }
+    if (!cap) { showToast('Please complete the CAPTCHA verification.', 'error'); return; }
+    demoOTP = String(Math.floor(100000 + Math.random() * 900000));
+    otpSent = true;
+    document.getElementById('otp-pane').style.display = 'block';
+    document.getElementById('btn-otp').textContent = '📲 OTP Sent — Resend';
+    showToast('Demo OTP: ' + demoOTP + ' (shown for demo only)', 'info', 10000);
+  }
+
+  function verifyOTP() {
+    const entered = document.getElementById('otp-val').value.trim();
+    if (!otpSent) { showToast('Please request OTP first.', 'error'); return; }
+    if (entered !== demoOTP) { showToast('Incorrect OTP. Please try again.', 'error'); return; }
+    const mobile = document.getElementById('mobile-num').value.trim();
+    const session = { type: 'mobile', mobile, name: 'Citizen ' + mobile.slice(-4) };
+    localStorage.setItem('mcl_citizen_session', JSON.stringify(session));
+    showToast('✅ Login successful! Redirecting…', 'success');
+    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+  }
+
+  let aadhaarOTP = '';
+  function sendAadhaarOTP() {
+    const num = document.getElementById('aadhaar-num').value.replace(/\s/g,'');
+    const cap = document.getElementById('cap2').checked;
+    if (!/^\d{12}$/.test(num)) { showToast('Please enter a valid 12-digit Aadhaar number.', 'error'); return; }
+    if (!cap) { showToast('Please complete the CAPTCHA verification.', 'error'); return; }
+    aadhaarOTP = String(Math.floor(100000 + Math.random() * 900000));
+    document.getElementById('aadhaar-otp-pane').style.display = 'block';
+    showToast('Demo Aadhaar OTP: ' + aadhaarOTP, 'info', 10000);
+  }
+
+  function verifyAadhaarOTP() {
+    const entered = document.getElementById('aadhaar-otp-val').value.trim();
+    if (entered !== aadhaarOTP) { showToast('Incorrect OTP.', 'error'); return; }
+    const session = { type: 'aadhaar', name: 'Aadhaar User' };
+    localStorage.setItem('mcl_citizen_session', JSON.stringify(session));
+    showToast('✅ Aadhaar authentication successful! Redirecting…', 'success');
+    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+  }
+
+  function guestLogin() {
+    const session = { type: 'guest', name: 'Guest' };
+    localStorage.setItem('mcl_citizen_session', JSON.stringify(session));
+    showToast('Continuing as guest… Redirecting to portal.', 'info');
+    setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+  }
+
+  // If already logged in, show info
+  try {
+    const s = JSON.parse(localStorage.getItem('mcl_citizen_session') || 'null');
+    if (s) {
+      showToast('Already logged in as ' + (s.name || s.mobile || 'Citizen'), 'info', 4000);
+    }
+  } catch(e) {}
+</script>
+
+</body>
+</html>

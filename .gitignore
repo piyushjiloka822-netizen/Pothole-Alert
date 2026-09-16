@@ -1,0 +1,18 @@
+# Secrets — never commit these
+.env
+.env.local
+.env.*.local
+
+# Dependencies and local runtime data
+node_modules/
+*.db
+*.db-shm
+*.db-wal
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Vercel
+.vercel

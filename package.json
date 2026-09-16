@@ -1,0 +1,17 @@
+{
+  "name": "pothole-management-system",
+  "version": "2.0.0",
+  "description": "MCL Pothole Grievance Portal — Full-Stack Backend with SQLite, Express, and Gemini AI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "multer": "^1.4.5-lts.1"
+  }
+}
